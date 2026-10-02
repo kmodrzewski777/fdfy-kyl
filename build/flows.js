@@ -1,4 +1,4 @@
-// ---------- kampanie (dane demonstracyjne generowane deterministycznie)
+// ---------- kampanie
 const CAMPS=[
  // id, nazwa, typ, kanał, przychód w 30 dni (tys. zł), AOV, wysyłki dziennie, OR, CTOR, wypisy / dostarczone, start
  ['a1','Powitanie nowego leada','Activation','e-mail',78,820,260,.58,.19,.004],
@@ -81,8 +81,8 @@ function renderFlows(){const el=document.getElementById('fl-kpi');if(!el)return;
  const head='<div class="fr fr-h"><div class="fr-n">Kampania</div><div class="fr-rv">Przychód</div><div class="fr-v" title="Udział kampanii w całym przychodzie firmy w wybranym okresie">% przychodu firmy</div><div class="fr-v" title="Zakupy przypisane przez cel (Goal)">Konwersje</div><div class="fr-v">CR</div><div class="fr-v">Wysłane</div><div class="fr-v">OR</div><div class="fr-v">CTOR</div><div class="fr-v">Wypisy</div></div>';
  $('#fl-tab').innerHTML=`<div class="fl-bar" role="img" aria-label="Udział automatyzacji w przychodzie firmy">${['Activation','Recovery','Retention','Win-back'].map(t=>{const v=sum(ids.filter(id=>C[id].t===t),0).rv;return `<i style="flex:${v};background:${FLC[t]}" title="${t}: ${zl(v)}"></i>`;}).join('')}<i style="flex:${Math.max(0,totRv-all.rv)};background:var(--surface-2)" title="Pozostały przychód: ${zl(totRv-all.rv)}"></i></div><div class="fl-bl"><span>${['Activation','Recovery','Retention','Win-back'].map(t=>`<em><i style="background:${FLC[t]}"></i>${t}</em>`).join('')}<em><i style="background:var(--surface-2)"></i>pozostała sprzedaż</em></span><b>${p1(shr)} przychodu firmy z ${ids.length} automatyzacji</b></div>`+['Activation','Recovery','Retention','Win-back'].filter(t=>FLT==='all'||FLT===t).map(t=>{const L=ids.filter(id=>C[id].t===t).sort((a,b)=>st(b,0).rv-st(a,0).rv),a=sum(L,0);if(!L.length)return '';
   return `<div class="fl-blk"><div class="fl-bh"><div class="fl-bt"><span class="eyebrow">${t}</span><b>${zl(a.rv)}</b></div><div class="fl-bs"><span><b>${p1(P(a.rv,totRv))}</b>przychodu firmy</span><span><b>${f(a.cv)}</b>konwersje</span><span><b>${p1(P(a.op,a.del))}</b>OR</span><span><b>${p1(P(a.cl,a.op))}</b>CTOR</span><span><b>${L.length}</b>${L.length===1?'kampania':L.length<5?'kampanie':'kampanii'}</span></div></div>${head}${L.map(row).join('')}</div>`;}).join('');}
-let FLHID=[];try{FLHID=JSON.parse(localStorage.getItem('fl-hid-demo')||'[]')}catch(e){}
-const flSave=()=>{try{localStorage.setItem('fl-hid-demo',JSON.stringify(FLHID))}catch(e){}};
+let FLHID=[];try{FLHID=JSON.parse(localStorage.getItem('fl-hid')||'[]')}catch(e){}
+const flSave=()=>{try{localStorage.setItem('fl-hid',JSON.stringify(FLHID))}catch(e){}};
 const flHide=(id,h)=>{FLHID=h?[...new Set([...FLHID,id])]:FLHID.filter(x=>x!==id);flSave();renderFlows();};
 document.addEventListener('click',e=>{const b=e.target.closest('.fl-restore');if(!b)return;const ov=document.getElementById('hp-ov');ov.querySelector('.sc-mh b').textContent='Ukryte kampanie';
  document.getElementById('hp-b').innerHTML=`<p>Zaznacz kampanie, które chcesz przywrócić do raportu.</p><div class="rs-l">${FLHID.map(id=>{const c=FLOWS.c[id];return c?`<label class="rs-i"><input type="checkbox" value="${id}"><span><b>${esc(c.n)}</b><small>${c.t}</small></span></label>`:'';}).join('')}</div><div class="rs-a"><button type="button" class="rs-all">Zaznacz wszystkie</button><button type="button" class="rs-ok">Przywróć zaznaczone</button></div>`;

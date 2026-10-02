@@ -23,8 +23,7 @@ let AI={html:`
 <li><b>Ocena posiłków bez celu sprzedażowego.</b> Kampania nie podnosi sprzedaży: zostawić ją jako źródło NPS i wiedzy o menu, bez kodu rabatowego.</li>
 </ul>
 <h4>Co tydzień patrzeć tylko na to</h4>
-<ul><li>scoring retencji i jego składowe</li><li>udział automatyzacji w przychodzie firmy</li><li>ilu wraca na 100 odchodzących</li><li>przejście 1. → 2. zamówienie</li><li>zgoda na push wśród użytkowników aplikacji</li><li>wyniki testów holdout</li></ul>
-<p style="font-size:12px;color:var(--muted);margin-top:18px">Wersja demonstracyjna: wszystkie liczby są przykładowe.</p>`};
+<ul><li>scoring retencji i jego składowe</li><li>udział automatyzacji w przychodzie firmy</li><li>ilu wraca na 100 odchodzących</li><li>przejście 1. → 2. zamówienie</li><li>zgoda na push wśród użytkowników aplikacji</li><li>wyniki testów holdout</li></ul>`};
 (()=>{const btn=$('#ai-btn'),pan=$('#ai-pan'),x=$('#ai-x');if(!btn||!pan)return;
  const open=o=>{if(o){$('#ai-body').innerHTML=AI.html;pan.hidden=false;requestAnimationFrame(()=>pan.classList.add('open'));}else{pan.classList.remove('open');setTimeout(()=>pan.hidden=true,260);}btn.setAttribute('aria-expanded',o);};
  btn.onclick=e=>{e.stopPropagation();open(pan.hidden);};x.onclick=()=>open(false);document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!pan.hidden)open(false);});

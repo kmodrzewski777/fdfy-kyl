@@ -72,11 +72,11 @@ def resub(pat, new, count=1, flags=re.S):
     S = S2
 
 # ---------- HTML ----------
-rep('<title>Insights @ RetentionQ</title>', '<title>Insights Demo · RetentionQ</title>')
-rep('/* Design system Foodify (z maili Design Studio)', '/* Design system Insights (wersja demonstracyjna)')
-rep('subject=Pytanie%20do%20Insights%20Foodify', 'subject=Insights%20%E2%80%93%20wersja%20demo', 2)
+rep('<title>Insights @ RetentionQ</title>', '<title>Insights @ RetentionQ</title>')
+rep('/* Design system Foodify (z maili Design Studio)', '/* Design system Insights')
+rep('subject=Pytanie%20do%20Insights%20Foodify', 'subject=Pytanie%20do%20Insights', 2)
 rep('<span class="asof" id="asof">Dane z 1 października 2026, 20:48</span><button class="chip refresh" id="refresh" type="button">Aktualizuj dane</button><span class="rf-msg" id="rf-msg"></span>',
-    '<span class="asof" id="asof">Wersja demonstracyjna · dane przykładowe</span><span class="demo-b">DEMO</span>')
+    '<span class="asof" id="asof">Dane z 1 października 2026</span>')
 rep('<a class="sb-part k" href="#p8part">Programy</a><a href="#p800">Jedzeniowe 800+</a> ', '')
 rep('<a href="#rabaty">Rabaty</a><a href="#cashback">Cashback</a>', '<a href="#rabaty">Rabaty</a>')
 rep('\n    <a class="sb-part d" href="#dzialania" hidden>Działania</a><a href="#automatyzacje" hidden>Automatyzacje</a></nav>', '</nav>')
@@ -113,7 +113,7 @@ resub(r'<p>Scoring to średnia ważona sześciu wskaźników retencji\..*?<p>Ska
 # ---------- CSS ----------
 rep('</style>\n<div class="wrap">', '''body{overflow-x:clip}.sc-card>*{min-width:0}#ch-sc,#ch-sc svg{max-width:100%}#fl-tab{overflow-x:auto}#fl-tab .fl-blk{min-width:860px}.fl-bar,.fl-bl{min-width:0}
 @media (max-width:700px){.scope,.catnav{overflow-x:auto;max-width:100%;scrollbar-width:none}.fl-dh{flex-wrap:wrap}}
-.demo-b{display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;letter-spacing:.1em;padding:3px 8px;border-radius:99px;background:var(--magenta);color:var(--on-accent)}
+
 .fl-sum{font-size:13px;color:var(--muted)}.fl-sum b{color:var(--fg);font-weight:600}.fl-sum .fl-sh{color:var(--magenta)}
 .fl-bar{display:flex;height:14px;border-radius:99px;overflow:hidden;gap:2px;margin:6px 0 8px}.fl-bar i{display:block;min-width:2px}
 .fl-bl{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;font-size:12.5px;color:var(--muted);margin-bottom:18px}.fl-bl span{display:flex;flex-wrap:wrap;gap:6px 14px}.fl-bl em{font-style:normal;display:inline-flex;align-items:center;gap:6px}.fl-bl em i{width:10px;height:10px;border-radius:3px;display:inline-block}.fl-bl b{color:var(--fg);font-weight:600}
@@ -173,7 +173,7 @@ rep("<span class=\"tsub\">miesięcznie przy obecnym tempie (~${R.perDay} zamówi
 rep("[()=>renderP8(),'p800'],", '')
 rep("[()=>renderCB(),'d-cb'],", '')
 # pomoc
-resub(r"const HELP=\{flowrev:`.*?`,money:", "const HELP={flowrev:`<p><b>Przychód z kampanii</b> = suma wartości zamówień przypisanych do kampanii przez cele (Goals): zakup w oknie atrybucji od otwarcia wiadomości (Recovery 1 dzień, pozostałe typy 7 dni).</p><p><b>Udział w przychodzie firmy</b> = przychód z kampanii ÷ cały przychód sklepu w tym samym okresie.</p><p><b>OR</b> = otwarcia ÷ dostarczone. <b>CTOR</b> = kliknięcia ÷ otwarcia. <b>CR</b> = konwersje ÷ dostarczone. Dzisiejszy, niepełny dzień nie jest wliczany. Porównanie: ten sam okres bezpośrednio wcześniej.</p><p>Wersja demonstracyjna: dane przykładowe.</p>`,money:")
+resub(r"const HELP=\{flowrev:`.*?`,money:", "const HELP={flowrev:`<p><b>Przychód z kampanii</b> = suma wartości zamówień przypisanych do kampanii przez cele (Goals): zakup w oknie atrybucji od otwarcia wiadomości (Recovery 1 dzień, pozostałe typy 7 dni).</p><p><b>Udział w przychodzie firmy</b> = przychód z kampanii ÷ cały przychód sklepu w tym samym okresie.</p><p><b>OR</b> = otwarcia ÷ dostarczone. <b>CTOR</b> = kliknięcia ÷ otwarcia. <b>CR</b> = konwersje ÷ dostarczone. Dzisiejszy, niepełny dzień nie jest wliczany. Porównanie: ten sam okres bezpośrednio wcześniej.</p>`,money:")
 rep("<li><b>Wartość klienta w grupie.</b> Dla każdego segmentu RFM sumujemy lifetime_revenue jego klientów (atrybut z profilu, liczony ze środków przedziałów: do 300, 300–1000, 1000–3000, 3000–6000, 6000–10 000, 10 000+ zł).</li>",
     "<li><b>Wartość klienta w grupie.</b> Dla każdego segmentu RFM sumujemy lifetime_revenue jego klientów (liczony ze środków przedziałów: do 300, 300–1000, 1000–3000, 3000–6000, 6000–10 000, 10 000+ zł).</li>")
 rep("<li><b>Roczny przychód na klienta</b> = suma lifetime_revenue grupy ÷ liczba klientów grupy × 12/11 (historia obejmuje ok. 11 miesięcy, przeliczamy na rok).</li>",

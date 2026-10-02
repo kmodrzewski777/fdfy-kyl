@@ -1,4 +1,4 @@
-// ---------- inkrementalność: testy holdout 70/30 (dane demonstracyjne)
+// ---------- inkrementalność: testy holdout 70/30
 const INC={tests:[
  // kampania, start, dni, [grupa z kampanią, % kupujących], [holdout, % kupujących]
  {id:'t1',from:'2026-08-20',days:42,m:[7100,.483],h:[3040,.432]},
@@ -21,7 +21,7 @@ INC.tests.forEach((T,ti)=>{const c=FLOWS.c[T.id],i0=Math.round((D0(T.from)-D0(FL
  T.lift=ph?T.d/ph:0;T.extra=T.d*T.M.n;T.inc=T.extra*T.aov;
  let s=ti*131+7;const R=()=>{s=(s*16807)%2147483647;return s/2147483647;},tau=T.days/2.6,cu=k=>(1-Math.exp(-k/tau))/(1-Math.exp(-T.days/tau));
  T.lm=[];T.lh=[];for(let k=1;k<=T.days;k++){const w=cu(k);T.lm.push(pm*w*(1+(k<T.days?(R()-.5)*.03:0))*100);T.lh.push(ph*Math.pow(w,1.04)*(1+(k<T.days?(R()-.5)*.03:0))*100);}});
-let IKP='all';try{IKP=localStorage.getItem('ik-p-demo')||'all';if(IKP!=='all'&&!INC.tests.some(t=>t.id===IKP))IKP='all';}catch(e){}
+let IKP='all';try{IKP=localStorage.getItem('ik-p')||'all';if(IKP!=='all'&&!INC.tests.some(t=>t.id===IKP))IKP='all';}catch(e){}
 function renderInkr(){const el=document.getElementById('ik-ch');if(!el)return;const TS=INC.tests,ok=TS.filter(t=>t.sig),mag=cssv('--magenta');
  const pct=x=>(x*100).toFixed(1).replace('.',',')+'%',nn=x=>Math.round(x).toLocaleString('pl-PL'),zlx=x=>(x<0?'−':'')+zl(Math.abs(x)),sg=x=>x>0?'+':x<0?'−':'';
  const incOk=ok.reduce((a,t)=>a+t.inc,0),grOk=ok.reduce((a,t)=>a+t.gr,0),avgLift=ok.reduce((a,t)=>a+t.lift,0)/ok.length,holdN=TS.reduce((a,t)=>a+t.H.n,0);
@@ -49,5 +49,5 @@ function renderInkr(){const el=document.getElementById('ik-ch');if(!el)return;co
  KK.innerHTML=`<div class="fl-k">${K.map(([l,v])=>`<div class="tile" data-noseg="1"><span class="eyebrow">${l}</span><span class="big">${v}</span></div>`).join('')}</div>`;
  LH.textContent='% kupujących od startu testu';
  const t0=D0(T.from);lines(CH,[{n:'Dostają kampanię',noweek:1,noscope:1,pct:1,c:cssv('--magenta'),d:T.lm,date:i=>dfmt(new Date(t0+i*864e5))},{n:'Holdout',noscope:1,pct:1,c:cssv('--l1'),d:T.lh,date:i=>dfmt(new Date(t0+i*864e5))}],[],0,10,'% kupujących od startu testu',document.getElementById('leg-ik'));}
-document.addEventListener('click',e=>{const b=e.target.closest('[data-ikp],[data-ik]');if(!b)return;const v=b.dataset.ikp||b.dataset.ik;IKP=IKP===v&&b.dataset.ik?'all':v;try{localStorage.setItem('ik-p-demo',IKP)}catch(x){};renderInkr();if(b.dataset.ik)document.getElementById('ik-verdict').scrollIntoView({behavior:RM?'auto':'smooth',block:'center'});});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-ikp],[data-ik]');if(!b)return;const v=b.dataset.ikp||b.dataset.ik;IKP=IKP===v&&b.dataset.ik?'all':v;try{localStorage.setItem('ik-p',IKP)}catch(x){};renderInkr();if(b.dataset.ik)document.getElementById('ik-verdict').scrollIntoView({behavior:RM?'auto':'smooth',block:'center'});});
 document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const r=e.target.closest&&e.target.closest('tr[data-ik]');if(r)r.click();});
