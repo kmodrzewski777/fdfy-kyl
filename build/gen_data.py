@@ -201,21 +201,28 @@ for d in lead_dates:
     l = 168 * nz(0.3) + (R.uniform(45, 130) if d.weekday() in SEND else 0)
     if d in (date(2026, 8, 5), date(2026, 9, 16)): l += R.uniform(150, 260)   # porządki po kampaniach
     lead_e.append(round(e)); lead_l.append(round(l))
-SUNSET = 2037
-lead_l[lead_dates.index(date(2026, 9, 9))] = SUNSET
+# comiesięczne czystki bazy (higiena): kontakty bez reakcji od 90+ dni; ok. 79% to leadzi
+DUMPS = [(date(2025, 8, 19), 1214), (date(2025, 9, 16), 1873), (date(2025, 10, 14), 2416), (date(2025, 11, 12), 2958), (date(2025, 12, 9), 3317),
+         (date(2026, 1, 20), 3792), (date(2026, 2, 17), 4105), (date(2026, 3, 10), 4463), (date(2026, 4, 14), 3981), (date(2026, 5, 12), 4327),
+         (date(2026, 6, 9), 4689), (date(2026, 7, 15), 5012), (date(2026, 8, 12), 4571), (date(2026, 9, 9), 5238)]
+LDUMP = {d: round(n * R.uniform(.76, .82)) for d, n in DUMPS}
+for d, n in LDUMP.items():
+    if d in lead_dates: lead_l[lead_dates.index(d)] = n
+SUNSET = LDUMP[date(2026, 9, 9)]
 lead_t, t = [], LEADS - sum(lead_e[1:]) + sum(lead_l[1:])
 for i in range(len(lead_dates)):
     if i: t += lead_e[i] - lead_l[i]
     lead_t.append(t)
 si = lead_dates.index(date(2026, 9, 1))
-SUN = dict(start='2026-09-09')
+SUN = dict(start='2026-07-14')
 s, c = [], []
-sv, cv = SUNSET + 143, 4917
-for i in range(24):
-    s.append(round(sv)); c.append(round(cv))
-    sv += R.uniform(35, 110) - (R.uniform(40, 160) if R.random() < 0.18 else 0)     # wygaszeni minus przywróceni
-    cv += R.gauss(-18, 62) + (R.uniform(120, 260) if R.random() < 0.12 else 0)
-SUN.update(s=s, c=c)
+cv = 4630.0
+for d in lead_dates:
+    s.append(sum(n for dd, n in LDUMP.items() if timedelta(0) <= d - dd < timedelta(90)) - round(R.uniform(0, 60)))   # wygaszeni w 90 dni minus przywróceni
+    if d in LDUMP: cv -= LDUMP[d] * R.uniform(.93, .99)
+    cv += R.gauss(128, 46) + (R.uniform(150, 320) if d.weekday() in SEND and R.random() < .3 else 0)
+    c.append(round(cv))
+SUN.update(s=s, c=c, dumps=[[f'{MON[d.month-1]} {str(d.year)[2:]}', n, LDUMP[d], f'{d.day} {MON[d.month-1]}'] for d, n in DUMPS])
 LB_ev = [['Otworzyli aplikację',9857],['Oglądali ekrany w aplikacji',12431],['Zalogowali się',6893],['Zaczęli quiz dietetyczny',4662],['Sprawdzili dostawę pod adres',3974],['Oglądali dietę',8216],['Dodali do koszyka',3418],['Rozpoczęli checkout',1977],['Rozpoczęli płatność',1306]]
 LB_pg = [['Strona główna',11823],['Menu / kalendarz',7286],['Konfiguracja diety',5914],['Dane konta',4097],['Koszyk',3612],['Podsumowanie / checkout',2461],['Program lojalnościowy',2052],['Ekran kuponów',1693],['Wybór płatności',1647],['Błąd zamówienia',43]]
 LB = dict(tot=LEADS, ev=LB_ev, pg=LB_pg,
@@ -246,8 +253,8 @@ def cons_series(start, end, gross, unsub, dips, shocks=(), launch=None):
     arr[-1] = end
     return arr
 CONS = dict(start='2025-06-02',
-            c28=cons_series(3912, NEWS, 118, 31, [(date(2026, 3, 10), 1651), (date(2026, 9, 9), SUNSET)]),
-            c71=cons_series(2147, SMS, 71, 18, [(date(2026, 3, 10), 643)], [(date(2026, 6, 2), 388)]),
+            c28=cons_series(3912, NEWS, 118, 31, DUMPS),
+            c71=cons_series(2147, SMS, 71, 18, [(d, round(n * R.uniform(.09, .14))) for d, n in DUMPS], [(date(2026, 6, 2), 388)]),
             c523=cons_series(0, PUSH, 63, 9, [], [(date(2026, 2, 17), 412), (date(2026, 7, 22), 297)], launch=date(2025, 9, 15)))   # wylogowania po aktualizacjach aplikacji
 
 # ---------------- aplikacja
@@ -298,8 +305,8 @@ MOM = dict(newc=[msum(newc, newc_dates, 8), msum(newc, newc_dates, 9)], second=[
            rfm={g['k']: [g['hist'][0], g['hist'][-1]] for g in RFM},
            leadsIn=[msum(lead_e, lead_dates, 8), msum(lead_e, lead_dates, 9)],
            leadsOut=[msum(lead_l, lead_dates, 8, 1000), msum(lead_l, lead_dates, 9, 1000)],
-           sunset=[0, SUNSET], sunCandIn=[4117, 3869],
-           consE=[month_delta(CONS['c28'], 8) + 2311, month_delta(CONS['c28'], 9) + SUNSET + 2311],
+           sunset=[LDUMP[date(2026, 8, 12)], SUNSET], sunCandIn=[4117, 3869],
+           consE=[month_delta(CONS['c28'], 8) + 4571 + 2311, month_delta(CONS['c28'], 9) + 5238 + 2311],
            consS=[month_delta(CONS['c71'], 8) + 1093, month_delta(CONS['c71'], 9) + 1093],
            click30=[5046, LEAD['click30']], open30=[24873, LEAD['open30']], leadsEnd=[lead_t[si - 1], LEADS])
 CHURNP = {1: dict(R1=[14, 3761], R2=[27, 2406], R3=[23, 1247], R4=[13, 331]),
