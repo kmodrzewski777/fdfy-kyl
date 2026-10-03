@@ -217,7 +217,16 @@ DMAP_B = [['0–3', 0, 3, 650], ['4–7', 4, 7, 651], ['8–14', 8, 14, 814], ['
 # Wszystko trafia do jednego dokumentu w bazie (snapshot/current). HTML NIE jest zmieniany —
 # strona przy otwarciu czyta dane z bazy (applyData: klucze snapshotu + s['H']) i sama się przelicza/renderuje.
 s['APP'] = APP
-s['H'] = {'EMR': EMR, 'APPR': APPR, 'CHURNP': CHURNP, 'WT': WT, 'NCR': NCR, 'NK': NK, 'NCSEC': NCSEC, 'FLOWS': FLOWS,
+# Historia kafli segmentów (Czekają / Aktywni / Zagrożeni / Nieaktywni) — dopisywana przy każdym przeliczeniu.
+# Customer.io nie trzyma wstecznej historii segmentów statusów (powstały 1 paź), więc zbieramy ją sami od 2026-10-03.
+HG = ('R1', 'R2', 'R3', 'R4', 'R5', 'CHA', 'LOY', 'POT', 'NEW')
+row = {g: [WT.get(g), C['raw.%s.2' % g], sum(C['raw.%s.%d' % (g, j)] for j in (3, 4, 5)), sum(C['raw.%s.%d' % (g, j)] for j in (6, 7, 8))] for g in HG}
+row['all'] = [sum(row[g][k] or 0 for g in ('R1', 'R2', 'R3', 'R4', 'R5')) for k in range(4)]
+hist = raw.setdefault('seg_hist', {}); hist[raw['asof']] = row
+json.dump(raw, open(os.path.join(D, 'raw.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
+SEGH = {'dates': sorted(hist)[-90:]}
+SEGH['v'] = {g: [hist[d].get(g) for d in SEGH['dates']] for g in list(HG) + ['all']}
+s['H'] = {'SEGH': SEGH, 'EMR': EMR, 'APPR': APPR, 'CHURNP': CHURNP, 'WT': WT, 'NCR': NCR, 'NK': NK, 'NCSEC': NCSEC, 'FLOWS': FLOWS,
           'DMAP': {'asof': raw['asof'], 'b': DMAP_B, 'g': {g: [NAMES[g], dm[g]] for g in NAMES}}}
 s['asOf'] = raw['asof']; s['updatedAt'] = int(time.time() * 1000); s['v'] = 1
 json.dump(s, open(os.path.join(D, 'snapshot.json'), 'w'), ensure_ascii=False)

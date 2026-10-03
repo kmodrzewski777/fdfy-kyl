@@ -1187,6 +1187,12 @@ section.sk{position:relative}section.sk::after{content:"";position:absolute;inse
 .chr-bar{flex-basis:100%;height:8px;border-radius:99px;background:var(--line);overflow:hidden}.chr-bar i{display:block;height:100%;border-radius:99px}
 .sx-strip{display:none!important}
 .e2x{display:flex;gap:18px;margin:2px 0 10px}.e2x div{display:flex;flex-direction:column}.e2x b{font-size:30px;font-weight:600;line-height:1.05;letter-spacing:-.02em}.e2x span{font-size:12px;color:var(--muted)}
+.wrap{max-width:1720px!important}.zcols{grid-template-columns:repeat(4,minmax(0,1fr))}.st-kpi{grid-template-columns:repeat(5,minmax(0,1fr))}
+.spk{display:block;width:100%;height:34px;margin:6px 0 4px}.spk0{font-size:11px;color:var(--muted);margin:8px 0 6px;opacity:.85}.grad .spk0{color:#fff;opacity:.8}
+.spr{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}.alr{align-self:flex-start;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;cursor:help}
+.alr.a0{background:var(--surface-2);color:var(--muted)}.alr.a1{background:#e8f5ec;color:#1f7a3f}.alr.a4{background:#d7f0df;color:#126b33}.alr.a2{background:#fff1d6;color:#9a6200}.alr.a3{background:#fde2e2;color:#b42318}
+.wtx{font-size:12.5px;color:var(--muted)}
+@media (max-width:1500px){.st-kpi{grid-template-columns:repeat(3,minmax(0,1fr))}}@media (max-width:1300px){.zcols{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <div class="wrap">
 <header class="top">
@@ -1566,10 +1572,11 @@ function renderStatus(){
  const spark=(()=>{const T=ACTIVE_T.slice(-60),mn=Math.min(...T),mx=Math.max(...T),W=200,H=40,X=i=>i*W/(T.length-1),Y=v=>H-4-(v-mn)/(mx-mn)*(H-8);return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${T.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" opacity=".9"/></svg>`;})();
  const k=(cls,lab,big,col,line,body,foot,pc)=>`<div class="kp ${cls}">${cls==='grad'?VAN:''}<span class="eyebrow">${lab}</span><div class="zk-n"><span class="big" style="${col?'color:'+col:''}">${big}</span>${pc?`<em class="zk-p">${pc}</em>`:''}</div><div class="kl">${line}</div><div class="kb">${body}</div><span class="kf">${foot}</span></div>`;
  $('#tiles').innerHTML=
+  (()=>{const wt=Object.values(WT||{}).reduce((x,v)=>x+(v||0),0);return k('','Czekają na start',f(wt),'var(--magenta)',`<span>zamówili, dostawa jeszcze nie ruszyła</span>${spk(SHser('all',0),cssv('--magenta'))}`,'',`łącznie we wszystkich segmentach`,pf(wt,tot));})()+
   k('grad','Aktywni',f(nowv),'',`${(()=>{const w=win(sr('2026-07-06',ACTIVE_T),SCOPE,'avg');return w.p?dl(w.p,w.c).replace('m/m',PLAB()):''})()}`,spark,SCOPE?'średnio dziennie vs poprzednie '+SCOPE+' dni':'cała historia',pf(nowv,tot))+
   k('','Dostawa kończy się w 7 dni',f(exp),'var(--magenta)',`<span>bez kolejnego zamówienia</span>`,`<div class="e2x"><div><b style="color:var(--a0)">${f(sum('e03'))}</b><span>kończy się za 0–3 dni</span></div><div><b style="color:var(--a2)">${f(sum('e47'))}</b><span>za 4–7 dni</span></div></div><div class="tbar"><span style="flex:${sum('e03')};background:var(--a0)"></span><span style="flex:${sum('e47')};background:var(--a2)"></span></div>`,`w tym ${f(sum('e03'))} kończy się w ciągu 3 dni`,pf(exp,tot))+
-  k('','Zagrożeni'+MB(zoneRev(a,['d07','d814','d1530'])),f(rk),'var(--orange)',`<span>do 30 dni bez dostawy</span>`,seg([['1–7',sum('d07'),'--r0'],['8–14',sum('d814'),'--r1'],['15–30',sum('d1530'),'--r2']]),`najwięcej w przedziale 15–30 dni: ${f(sum('d1530'))}`,pf(rk,tot))+
-  k('','Nieaktywni'+MB(zoneRev(a,['d3160','d6190','d90'])),f(lp),'',`<span>30+ dni bez dostawy</span>`,seg([['31–60',sum('d3160'),'--l0'],['61–90',sum('d6190'),'--l1'],['90+',sum('d90'),'--l2']]),`${f(sum('d90'))} bez dostawy od ponad 90 dni`,pf(lp,tot));
+  k('','Zagrożeni'+MB(zoneRev(a,['d07','d814','d1530'])),f(rk),'var(--orange)',`<span>do 30 dni bez dostawy</span><div class="spr">${spk(SHser('all',2),cssv('--orange'))}${alertB(SHser('all',2))}</div>`,seg([['1–7',sum('d07'),'--r0'],['8–14',sum('d814'),'--r1'],['15–30',sum('d1530'),'--r2']]),`najwięcej w przedziale 15–30 dni: ${f(sum('d1530'))}`,pf(rk,tot))+
+  k('','Nieaktywni'+MB(zoneRev(a,['d3160','d6190','d90'])),f(lp),'',`<span>30+ dni bez dostawy</span><div class="spr">${spk(SHser('all',3),cssv('--ink'))}${alertB(SHser('all',3))}</div>`,seg([['31–60',sum('d3160'),'--l0'],['61–90',sum('d6190'),'--l1'],['90+',sum('d90'),'--l2']]),`${f(sum('d90'))} bez dostawy od ponad 90 dni`,pf(lp,tot));
  const R=26,C=2*Math.PI*R,rg=p=>`<svg class="tring" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="8"/><circle cx="32" cy="32" r="${R}" fill="none" stroke="var(--magenta)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${C*p} ${C}" transform="rotate(-90 32 32)"/></svg>`;
  $('#st-side').innerHTML=`
   <div class="kp nofilter sm"><span class="eyebrow">1. → 2. zakup</span><div class="smr">${rg(STATIC.ladder[1].v/STATIC.ladder[0].v)}<div><span class="big">${pf(STATIC.ladder[1].v,STATIC.ladder[0].v)}</span>${dl(...MOM.second).replace('m/m','drugich zakupów m/m')}</div></div><span class="kf">${f(MOM.second[1])} drugich zakupów we wrześniu, ${f(MOM.second[0])} w sierpniu</span></div>
@@ -1628,12 +1635,28 @@ function onbCard(){const S=SCOPE||0,c0=-(S||9999)-CUT,c1=-1-CUT,R=NCR.filter(r=>
  const z=(l,v,pc,cls,st)=>`<div data-noseg="1" class="kp zk ${cls||''}"><span class="eyebrow">${l}</span><div class="zk-n"><span class="big" style="${st||''}">${f(v)}</span>${pc?`<em class="zk-p">${pc}</em>`:''}</div></div>`;
  return `<div class="sx onb" style="--c:#9ca3af"><div class="sx-id"><span class="nm">Onboarding</span><span class="df">1. zamówienie</span><span class="tt">${f(T)}</span></div>
   <div class="zcols">${z('Jedzą',eat.length,pf(eat.length,T),'grad')}${z('Czekają na start',wait,pf(wait,T))}${z('Koniec ≤7 dni',end7,pf(end7,T),'','color:var(--orange)')}${z('2. zamówienie',NCSEC[0],pf(NCSEC[0],NCSEC[1]))}</div></div>`;}
+let SEGH={dates:[],v:{}};
+// seria kafla: g = R1..R5/CHA/LOY/POT/NEW/all, i: 0 czekają, 1 aktywni, 2 zagrożeni, 3 nieaktywni
+const SHser=(g,i)=>(SEGH.v[g]||[]).map(r=>r?r[i]:null).filter(v=>v!=null);
+function spk(a,col,light){if(a.length<2)return `<div class="spk0">wykres od ${SEGH.dates[0]?dfmt(new Date(SEGH.dates[0]+'T00:00:00Z')):'dziś'}</div>`;
+ const W=200,H=34,mn=Math.min(...a),mx=Math.max(...a),r=mx-mn||1,p=a.map((v,i)=>[i/(a.length-1)*W,H-3-(v-mn)/r*(H-6)]);
+ const d=p.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(''),l=p[p.length-1];
+ return `<svg class="spk" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="${col}" stroke-width="1.8" vector-effect="non-scaling-stroke" style="stroke:${col}"/><circle cx="${l[0]}" cy="${l[1]}" r="2.6" style="fill:${col}"/></svg>`;}
+// alert dla strefy, w której wzrost jest zły (zagrożeni, nieaktywni)
+function alertB(a){if(a.length<7)return `<span class="alr a0" title="Alert włączy się po 7 dniach danych">za mało danych</span>`;
+ const n=a.length,k=Math.min(14,n-1),ch=(a[n-1]-a[n-1-k])/Math.max(1,a[n-1-k])*100;let up=0;for(let i=n-k;i<n;i++)if(a[i]>a[i-1])up++;
+ const t=`${ch>=0?'+':''}${ch.toFixed(1).replace('.',',')}% w ${k} dni`;
+ if(ch>5&&up>=k*0.6)return `<span class="alr a3" title="${t}, rośnie ${up} z ${k} dni">Reaguj ▲</span>`;
+ if(ch>2)return `<span class="alr a2" title="${t}">Uwaga ▲</span>`;
+ if(ch<-2)return `<span class="alr a4" title="${t}">Świetnie ▼</span>`;
+ return `<span class="alr a1" title="${t}">OK</span>`;}
 function renderGX(){
  const gs=G(),totRev=gs.reduce((x,g)=>x+g.rev,0),ZK=['e03','d814','d3160'];
  $('#gx').innerHTML=gs.map(g=>{
   const T=g.tot*share(g);
   const mom=MOM.rfm[g.k]?dl(...MOM.rfm[g.k]):g.k==='NEW'?dl(...MOM.newc).replace('m/m','nowych m/m'):g.k==='POT'?dl(...MOM.second).replace('m/m','wejść m/m'):'';
-  let WT={R1:136,R2:94,R3:83,R4:6,R5:0}[g.k]||0,wv=Math.round(WT*share(g));
+  const wv=Math.round(((typeof WT==='object'&&WT[g.k])||0)*share(g));
+  const wtile=`<div data-noseg="1" class="kp zk wt ${g.k==='R5'?'zoff':''}"><span class="eyebrow">Czekają na start</span><div class="zk-n"><span class="big">${f(wv)}</span><em class="zk-p">${pf(wv,T)}</em></div><div class="spr">${spk(SHser(g.k,0),cssv('--magenta'))}</div><div class="kb"><div class="wtx">zamówili, dostawa jeszcze się nie zaczęła</div></div><span class="kf">${wv?'pierwsza dostawa w przyszłości':'nikt nie czeka'}</span></div>`;
   const zs=[0,1,2].map(z=>{const sts=ST.filter(s=>s.z===z),v=sts.reduce((x,s)=>x+val(g,s.k),0);
    const W=z===0?['#ffffff','#ffffff','#ffffff']:sts.map(s=>cssv(s.c));
    const lab=t=>t.n.replace('Bez dostawy ','').replace('Kończy się ','').replace('Dostawa trwa','trwa 8+ dni');
@@ -1642,15 +1665,15 @@ function renderGX(){
    const mxv=Math.max(...sts.map(t=>val(g,t.k)),1);
    const body=`<div class="qrows">${sts.map((t,i)=>{const q=val(g,t.k);return `<div class="qr"><span class="ql">${lab(t)}</span><span class="qt"><em style="width:${q>0?Math.max(2,q/mxv*100):0}%;background:${W[i]}"></em></span><b>${f(q)}</b><small>${pf(q,T)}</small></div>`;}).join('')}</div>`;
    const foot=v>0?`najwięcej: ${lab(top)} · ${f(val(g,top.k))}`:'nikogo w tej strefie';
-   return `<div data-noseg="1" class="kp zk ${z===0?'grad':''} ${g.k==='R5'&&z<2?'zoff':''}">${z===0?VAN:''}${z===0?`<div class="ew"><div data-seg="${({R1:839,R2:840,R3:841,R4:842})[g.k]||''}" style="cursor:pointer"><span class="eyebrow">Jedzą<span class="mbadge ewb">${pf(Math.max(0,v-wv),T)}</span></span><div class="zk-n"><span class="big">${f(Math.max(0,v-wv))}</span></div></div><div><span class="eyebrow">Czekają<span class="mbadge ewb">${pf(wv,T)}</span></span><div class="zk-n"><span class="big">${f(wv)}</span></div></div></div>`:`<span class="eyebrow">${ZONES[z].n}${money}</span>
-    <div class="zk-n"><span class="big" style="${z===1?'color:var(--orange)':''}">${f(v)}</span><em class="zk-p">${pf(v,T)}</em></div>`}
+   return `<div data-noseg="1" class="kp zk ${z===0?'grad':''} ${g.k==='R5'&&z<2?'zoff':''}">${z===0?VAN:''}${z===0?`<div data-seg="${({R1:839,R2:840,R3:841,R4:842})[g.k]||''}" style="cursor:pointer"><span class="eyebrow">Jedzą</span><div class="zk-n"><span class="big">${f(Math.max(0,v-wv))}</span><em class="zk-p">${pf(Math.max(0,v-wv),T)}</em></div></div>${spk(SHser(g.k,1),'#ffffff')}`:`<span class="eyebrow">${ZONES[z].n}${money}</span>
+    <div class="zk-n"><span class="big" style="${z===1?'color:var(--orange)':''}">${f(v)}</span><em class="zk-p">${pf(v,T)}</em></div><div class="spr">${spk(SHser(g.k,z+1),z===1?cssv('--orange'):cssv('--ink'))}${g.k==='R5'&&z<2?'':alertB(SHser(g.k,z+1))}</div>`}
     
     <div class="kb">${body}</div><span class="kf">${foot}</span></div>`;}).join('');
   return `<div class="sx" style="--c:var(${g.c})">
    <div class="sx-id"><span class="nm">${SICON(g.k)}${g.n}</span><span class="df">${g.d}</span><p class="sdesc">${DESC[g.k]}</p>
     <span class="tt">${f(T)}</span><div class="meta">${mom}<span>${pf(g.rev,totRev)} przychodu</span></div><div class="chr" title="Odsetek klientów aktywnych na początku okresu, którzy w wybranym okresie przekroczyli 30 dni bez dostawy">${(()=>{const S=g.st,w=CHURNP[SCOPE]&&!CUT?SCOPE:30,cp=w!==30&&CHURNP[w][g.k],den=cp?cp[1]:S.act+S.e47+S.e03+S.d07+S.d814+S.d1530+S.d3160,c=den?(cp?cp[0]:S.d3160)/den*100:0,sc=w===1?10:w===7?20:w===90?100:50,h=Math.round(130*(1-Math.min(1,c/sc)));return `<span>Churn rate (${w===1?"1 dzień":w+" dni"})</span>`+(()=>{return `<b style="color:hsl(${h} 65% 42%)">${den?c.toFixed(1).replace(".",",")+"%":"–"}</b><div class="chr-bar"><i style="width:${Math.min(100,c/sc*100)}%;background:linear-gradient(90deg,hsl(130 60% 45%),hsl(${h} 70% 50%))"></i></div>`;})();})()}</div>
     <div class="sx-strip">${[0,1,2].map(z=>`<span class="s${z}" style="flex:${ST.filter(s=>s.z===z).reduce((x,s)=>x+val(g,s.k),0)}"></span>`).join('')}</div></div>
-   <div class="zcols">${zs}</div></div>`;}).join('');
+   <div class="zcols">${wtile}${zs}</div></div>`;}).join('');
  $('#stleg').innerHTML='';
 }
 function decision(g){
@@ -2012,7 +2035,7 @@ const DKEYS=['APP','RAW','ACTIVE_T','MOM','CHURN','LEAD','P8','RB','SER','STATIC
 function applyData(d){if(!d||typeof d!=='object')return false;let ok=false;
  const set={APP:v=>APP=v,CONS:v=>CONS=v,LB:v=>LB=v,CB:v=>CB=v,RAW:v=>RAW=v,ACTIVE_T:v=>ACTIVE_T=v,MOM:v=>MOM=v,CHURN:v=>CHURN=v,LEAD:v=>LEAD=v,P8:v=>P8=v,RB:v=>RB=v,SER:v=>SER=v,STATIC:v=>STATIC=v};
  DKEYS.forEach(k=>{if(d[k]&&typeof d[k]==='object'){set[k](d[k]);ok=true;}});
- if(d.H&&typeof d.H==='object'){const H=d.H,hs={EMR:v=>EMR=v,APPR:v=>APPR=v,CHURNP:v=>CHURNP=v,WT:v=>WT=v,NCR:v=>NCR=v,NK:v=>NK=v,NCSEC:v=>NCSEC=v,DMAP:v=>DMAP=v,FLOWS:v=>FLOWS=v};Object.keys(hs).forEach(k=>{if(H[k]!=null){hs[k](H[k]);ok=true;}});}
+ if(d.H&&typeof d.H==='object'){const H=d.H,hs={SEGH:v=>SEGH=v,EMR:v=>EMR=v,APPR:v=>APPR=v,CHURNP:v=>CHURNP=v,WT:v=>WT=v,NCR:v=>NCR=v,NK:v=>NK=v,NCSEC:v=>NCSEC=v,DMAP:v=>DMAP=v,FLOWS:v=>FLOWS=v};Object.keys(hs).forEach(k=>{if(H[k]!=null){hs[k](H[k]);ok=true;}});}
  if(typeof d.asOf==='string'){ASOF=d.asOf;END=D0(d.asOf);}
  if(ok)prep();const el=document.getElementById('asof');if(el){el.dataset.live='1';el.textContent='Dane z '+(d.updatedAt?new Date(d.updatedAt).toLocaleString('pl-PL',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Warsaw'}):new Date(D0(ASOF)).toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}));}return ok;}
 (async()=>{const fb=(why)=>{const m=document.getElementById('rf-msg');if(m&&!m.textContent)m.textContent=why||'brak połączenia z bazą, pokazuję dane wbudowane';};try{if(typeof claude==='undefined'){fb();return;}const db=await claude.use('db');if(!db){fb();return;}PINDB=db;
@@ -2330,7 +2353,7 @@ async function ikCount(mcp,segs){const f=segs.length>1?{and:segs.map(id=>({segme
  const r=await mcp.callTool('Customer.io Pstryk','cio_read_api',{path:'/v1/environments/190673/customers',params:{filters:ikEnc(f)},limit:1,jq:'.meta.pagination.total'},{cache:false});let d=r&&r.payload;if(d&&d.data!==undefined)d=d.data;return +(typeof d==='string'?JSON.parse(d):d);}
 async function ikGoals(mcp){for(let t=0;t<25;t++){const r=await mcp.callTool('Customer.io Pstryk','cio_read_api',{path:'/v1/environments/190673/goals/2/goal_refresh',params:{start:INC.start,end:Math.floor(Date.now()/1000)},jq:'{p:.refresh_in_progress,r:[.goal_refresh[]|select(.campaign_id!=null)|[.campaign_id,.goal_count,.revenue]]}'},{cache:false});
   let d=r&&r.payload;if(d&&d.data!==undefined)d=d.data;if(typeof d==='string')d=JSON.parse(d);if(d&&!d.p)return d.r;await new Promise(z=>setTimeout(z,3000));}throw {code:'timeout'};}
-async function ikFetch(pop){const day=ikDays();if(day<1||IKBUSY[pop])return;const key=pop+'_'+ikDate(Date.now()),k=ikK(day);if(IKH[key]&&IKH[key].k===k)return;IKBUSY[pop]=1;
+async function ikFetch(pop){const day=ikDays();if(day<1||IKBUSY[pop]||typeof claude==='undefined')return;const key=pop+'_'+ikDate(Date.now()),k=ikK(day);if(IKH[key]&&IKH[key].k===k)return;IKBUSY[pop]=1;
  try{const mcp=await claude.use('mcp');if(!mcp)throw {code:'unavailable'};const P=INC.pops[pop],ex=P.seg?[P.seg]:[],ks=INC.K[k];
   const [mn,hn,mp,hp]=[await ikCount(mcp,[INC.m,...ex]),await ikCount(mcp,[INC.h,...ex]),await ikCount(mcp,[INC.m,...ex,ks]),await ikCount(mcp,[INC.h,...ex,ks])];
   let gc=0,gr=0;try{(await ikGoals(mcp)).forEach(([c,n,v])=>{if(P.camps.includes(String(c))){gc+=n;gr+=v;}});}catch(e){}
