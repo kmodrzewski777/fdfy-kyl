@@ -42,6 +42,18 @@ for i in range(14, 0, -1):
     if d not in raw.get('sample', {}) or ('dn' not in raw['sample'][d] and d not in raw.get('days_legacy', {})) or i == 1: print('S', d)
 print('#    purchases_yesterday: wszystkie strony logów z %s (continuation), jq .logs|map(select(.timestamp>=%d and .timestamp<%d))|length, suma -> put.py purchases_yesterday N'
       % (D0 - dt.timedelta(1), ts(D0 - dt.timedelta(1)), ts(D0)))
+# Weekend: zamówienia per dzień (doba warszawska, UTC+2) i harmonogramy dostaw z wczoraj
+print('\n# 3b. WEEKEND')
+for i in range(7, 0, -1):
+    d = D0 - dt.timedelta(i); S = ts(d) - 7200
+    if str(d) not in raw.get('orders_day', {}):
+        print('O %s purchase: %s/logs params={type:"event",name:"purchase",limit:50,from:"%sT22:00:00Z",to:"%sT21:59:59Z"} wszystkie strony (continuation), '
+              'jq=(.logs|map(select(.timestamp>=%d and .timestamp<=%d))) as $l|[($l|length),([$l[].attrs.value//0|tonumber]|add//0|floor),(.logs[-1].timestamp//0),.meta.continuation]|tojson'
+              '  koniec gdy timestamp < %d; zsumuj n,v -> put.py orders_day/%s \'[n,v]\'' % (d, E, d - dt.timedelta(1), d, S, S + 86399, S, d))
+yd = D0 - dt.timedelta(1); Y0 = ts(yd)
+print(('D %s diet_delivery_schedule: %s/logs params={type:"event",name:"diet_delivery_schedule",limit:50,from:"%sT00:00:00Z",to:"%sT23:59:59Z"} wszystkie strony (continuation, koniec gdy timestamp < %d), '
+       'jq=[(.logs|map(select(.timestamp>=%d and .timestamp<=%d))|map("\\(.customer_id|tostring|.[-5:])\\(.attrs.client_diet_uuid|tostring|.[-6:]):\\([(.attrs.days//[])[]|select(.>=%d)|(./86400|floor)|select(((.+4)%%7)==6 or ((.+4)%%7)==0)]|map(tostring)|join("."))")|join(",")),(.logs[-1].timestamp//0),.meta.continuation]|tojson'
+       '  -> KAŻDĄ stronę po kolei (od najnowszej): put.py wk_sched/%s \'<[0]>\'') % (yd, E, yd, yd, Y0, Y0, Y0 + 86399, ts(D0), yd))
 print('\n# 4. STRONY KLIENTÓW  %s/customers params={filters:<b64>,limit:50,page:p}' % E)
 B, M0, T30 = int(dt.datetime.now().timestamp()), ts(D0), ts(D0) - 30 * 86400
 JA = ('def d(x): ((x-%d)/86400|floor); [.customers[]|.attributes|((.active_diets//"[]"|fromjson? // []|map(.start_date|tonumber)|min)//0) as $s|'

@@ -46,6 +46,8 @@ Typy linii w `plan.py`:
 | `K kampania okres` | `/campaigns/<id>/metrics` (dni: 8, tygodnie: 12, miesiące: 13) | dni: `put.py flows/metrics/<id>/d '{"end":"<dziś>","v":<wynik>}'`, w/m: `put.py flows/metrics/<id>/w '<wynik>'` |
 | `G dzień` | `goal_refresh` dla celów 2, 7, 10, 11, suma per kampania (`p:true` = ponów) | `put.py flows/goals/<dzień> '{"<cid>":[liczba,przychód]}'` |
 | `X` | push miesięcznie (`all_deliveries`), `channel_metrics` kampanii 157/158 | `push_monthly`, `camp` |
+| `O dzień` | zamówienia z doby warszawskiej (wszystkie strony logów `purchase`), suma [n, wartość] | `put.py orders_day/<dzień> '[n,v]'` |
+| `D dzień` | wszystkie strony logów `diet_delivery_schedule` z wczoraj, od najnowszej; jq z planu | każda strona po kolei: `put.py wk_sched/<dzień> '<wynik[0]>'` |
 | `purchases_yesterday` | wszystkie strony logów z wczoraj, licz po `timestamp` | `put.py purchases_yesterday N` |
 
 Jak oszczędzać tokeny:
@@ -91,6 +93,8 @@ Segmenty:
 | Nowi klienci (`NK`, `NCR`, `NCSEC`, `WT`) | `nk.*`, `active_pages`, `sec_pages` | NK = P1(642) + P2(643) w oknach; NCSEC = drugie zamówienie w trakcie diety |
 | Dni dostaw (`DMAP`) | `dmap.*`, `raw.G.0/1` | |
 | Churn rate (`CHURNP`) | `churnp.*` | [odpłynęli, aktywni na początku] dla 1/7/90 dni |
+| Weekend (`WKD`) | `orders_day`, `wk_sched` | zamówienia per dzień tygodnia (do 56 dni); dostawy w 2 najbliższe weekendy = najnowsze zdarzenie harmonogramu per dieta (osoby = unikalni klienci) |
+| Czekający (`WAITB`), historia kafli (`SEGH`) | `wait_days`, `seg_hist` | kubełki 1–3 / 4–7 / 8+ dni do startu; historia dopisywana codziennie od 2026-10-03 |
 | Kampanie (`FLOWS`) | `flows.metrics`, `flows.goals`, `flows.meta` | od 2026-09-01; konwersje i przychód z celów 2/7/10/11 |
 
 ## 3. Kontrole po build.py
@@ -105,6 +109,7 @@ Segmenty:
 - Logi: `continuation` ignoruje okno from/to, więc dzień wybieraj po `timestamp`. `event_names.daily_count` to dzień bieżący.
 - `channel_metrics` ignoruje `steps` i zwraca 45 dni.
 - `segment_membership` w resolution `weeks`: pierwszy kubełek bywa niepełny (dlatego start od 2026-07-09, a build go pomija).
+- Harmonogramy dostaw: logi sięgają ~30 dni, więc dieta bez zmian harmonogramu od ponad 30 dni nie jest widoczna (luka znika przy codziennym pobieraniu `D`). Zdarzenie zmieniające dietę tak, że nie ma już przyszłych dni, nadpisuje starsze (pusta lista dni).
 - Routines nie mogą mieć connectorów w tej organizacji, więc przycisk „Zaktualizuj” nie odświeży danych sam.
 
 ## 5. Poza build.py (świadomie)

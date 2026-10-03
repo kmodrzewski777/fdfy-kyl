@@ -227,16 +227,30 @@ DMAP_B = [['0–3', 0, 3, 650], ['4–7', 4, 7, 651], ['8–14', 8, 14, 814], ['
 # Wszystko trafia do jednego dokumentu w bazie (snapshot/current). HTML NIE jest zmieniany —
 # strona przy otwarciu czyta dane z bazy (applyData: klucze snapshotu + s['H']) i sama się przelicza/renderuje.
 s['APP'] = APP
+# WKD: weekend. o = zamówienia per dzień (ostatnie 8 pełnych tygodni do wczoraj), d = dostawy w najbliższe 2 weekendy
+# z harmonogramów (najnowsze zdarzenie diet_delivery_schedule per dieta, logi ~30 dni wstecz).
+OD = raw.get('orders_day', {}); od = sorted(k for k in OD if k < raw['asof'])[-56:]
+ep = lambda d: (d - dt.date(1970, 1, 1)).days
+WS = D0 - dt.timedelta(1) if D0.weekday() == 6 else D0 + dt.timedelta((5 - D0.weekday()) % 7)
+wkd = []
+for k in range(2):
+    sa = WS + dt.timedelta(7 * k); a, b = ep(sa), ep(sa) + 1
+    sat = [v for v in raw.get('wk_sched', {}).values() if a in v[1]]; sun = [v for v in raw.get('wk_sched', {}).values() if b in v[1]]
+    anyd = [v for v in raw.get('wk_sched', {}).values() if a in v[1] or b in v[1]]
+    both = {v[0] for v in sat} & {v[0] for v in sun}
+    wkd.append({'sat': str(sa), 'd': [len(sat), len(sun), len(anyd)], 'p': [len({v[0] for v in sat}), len({v[0] for v in sun}), len({v[0] for v in anyd}), len(both)]})
+WKD = {'o': {'dates': od, 'n': [OD[k][0] for k in od], 'v': [OD[k][1] for k in od]}, 'd': wkd}
 # Historia kafli segmentów (Czekają / Aktywni / Zagrożeni / Nieaktywni) — dopisywana przy każdym przeliczeniu.
 # Customer.io nie trzyma wstecznej historii segmentów statusów (powstały 1 paź), więc zbieramy ją sami od 2026-10-03.
 HG = ('R1', 'R2', 'R3', 'R4', 'R5', 'CHA', 'LOY', 'POT', 'NEW')
 row = {g: [WT.get(g), C['raw.%s.2' % g], sum(C['raw.%s.%d' % (g, j)] for j in (3, 4, 5)), sum(C['raw.%s.%d' % (g, j)] for j in (6, 7, 8))] for g in HG}
 row['all'] = [sum(row[g][k] or 0 for g in ('R1', 'R2', 'R3', 'R4', 'R5')) for k in range(4)]
 hist = raw.setdefault('seg_hist', {}); hist[raw['asof']] = row
+WKD['act'] = row['all'][1]  # aktywni (jedzą teraz) jako mianownik udziału
 json.dump(raw, open(os.path.join(D, 'raw.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
 SEGH = {'dates': sorted(hist)[-90:]}
 SEGH['v'] = {g: [hist[d].get(g) for d in SEGH['dates']] for g in list(HG) + ['all']}
-s['H'] = {'SEGH': SEGH, 'WAITB': WAITB, 'EMR': EMR, 'APPR': APPR, 'CHURNP': CHURNP, 'WT': WT, 'NCR': NCR, 'NK': NK, 'NCSEC': NCSEC, 'FLOWS': FLOWS,
+s['H'] = {'WKD': WKD, 'SEGH': SEGH, 'WAITB': WAITB, 'EMR': EMR, 'APPR': APPR, 'CHURNP': CHURNP, 'WT': WT, 'NCR': NCR, 'NK': NK, 'NCSEC': NCSEC, 'FLOWS': FLOWS,
           'DMAP': {'asof': raw['asof'], 'b': DMAP_B, 'g': {g: [NAMES[g], dm[g]] for g in NAMES}}}
 s['asOf'] = raw['asof']; s['updatedAt'] = int(time.time() * 1000); s['v'] = 1
 json.dump(s, open(os.path.join(D, 'snapshot.json'), 'w'), ensure_ascii=False)

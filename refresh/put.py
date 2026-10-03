@@ -36,6 +36,17 @@ if path[:2] == ['flows', 'metrics'] and len(path) == 4 and path[3] == 'd' and is
         cur += [0] * max(0, i0 + len(arr) - len(cur)); cur[i0:i0 + len(arr)] = arr
     json.dump(raw, open(F, 'w'), ensure_ascii=False, separators=(',', ':'))
     print('ok', '/'.join(path), val['end']); sys.exit()
+if path[0] == 'wk_sched' and len(path) == 2:
+    # harmonogramy dostaw: jedna strona logów diet_delivery_schedule z dnia path[1] (od najnowszych), "c5u6:dzień.dzień,..."
+    # dzień = dni od 1970-01-01 (soboty/niedziele >= dziś). Nowszy dzień zdarzenia nadpisuje starszy; w obrębie dnia wygrywa pierwszy wpis.
+    import datetime as dt
+    ev = (dt.date.fromisoformat(path[1]) - dt.date(1970, 1, 1)).days; d = raw.setdefault('wk_sched', {}); n = 0
+    for e in filter(None, str(val).split(',')):
+        cu, _, ds = e.partition(':'); c, u = cu[:5], cu[5:11]
+        if u not in d or d[u][2] < ev:
+            d[u] = [c, [int(x) for x in ds.split('.') if x], ev]; n += 1
+    json.dump(raw, open(F, 'w'), ensure_ascii=False, separators=(',', ':'))
+    print('ok wk_sched', path[1], n); sys.exit()
 o = raw
 for p in path[:-1]: o = o.setdefault(p, {})
 k = path[-1]
