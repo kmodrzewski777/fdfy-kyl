@@ -1,122 +1,117 @@
 # Aktualizacja danych — Insights @ RetentionQ (Foodify)
 
-**Rule: all of the dashboard's logic is coded in. When refreshing, the LLM does not interpret or calculate anything by hand.**
-A refresh is three steps:
-1. Fetch raw data from Customer.io into `refresh/raw.json`.
-2. Run `python3 refresh/build.py`.
-3. Save the snapshot to the DB and publish.
+**Zasada:** cała logika dashboardu jest zakodowana w `refresh/build.py`. LLM przy aktualizacji niczego nie liczy ani nie interpretuje. Pobiera tylko surowe wyniki z Customer.io (według listy z `plan.py`), zapisuje je do `raw.json` przez `put.py` i uruchamia `build.py`.
 
 ```
-queries.json ──(MCP Customer.io)──▶ raw.json ──build.py──▶ snapshot.json + dashboard/foodify-retencja.html
+plan.py ──▶ (wywołania MCP Customer.io) ──put.py──▶ raw.json ──build.py──▶ snapshot.json + dashboard/foodify-retencja.html
 ```
 
-| File | Role |
+| Plik | Rola |
 |---|---|
-| `refresh/queries.json` | `[key, filter]` list of every count (about 224). Do not edit during a refresh. |
-| `refresh/raw.json` | ONLY raw API results. The only file the LLM fills in. |
-| `refresh/sample.jq` | jq that collapses one page of purchase logs into one `sample` row. |
-| `refresh/build.py` | All the logic: raw → every number, chart and table. Checks completeness: on `Brak liczników…`, fetch the missing ones. |
-| `refresh/snapshot.json` | The output, which is also the template: fields build.py does not compute pass through unchanged. |
-| `dashboard/foodify-retencja.html` | Artifact source. build.py replaces `let APP=`, `EMR=`, `APPR=` and the embedded `try{applyData({…})`. |
+| `refresh/queries.json` | 486 liczników `[klucz, filtr]`. Nie edytować. |
+| `refresh/plan.py` | Wypisuje **dokładnie** wywołania potrzebne na dziś (pomija to, co już jest w `raw.json`). |
+| `refresh/put.py` | Jedyny sposób zapisu do `raw.json`. Serie dzienne i metryki kampanii scala po datach, więc historia zostaje. |
+| `refresh/raw.json` | Tylko surowe dane z API plus skumulowana historia (członkostwo segmentów, cele kampanii, próbki zamówień). |
+| `refresh/sample.jq` | jq: jedna strona logów zakupów → jeden wiersz próbki. |
+| `refresh/build.py` | Przelicza **wszystko**: snapshot oraz stałe w HTML (`APP`, `EMR`, `APPR`, `NK`, `NCSEC`, `CHURNP`, `WT`, `NCR`, `DMAP`, `FLOWS`, `renderNC t0`, osadzony `try{applyData({…})`). Przy brakach przerywa i wypisuje, czego brakuje. |
+| `refresh/snapshot.json` | Wynik. Jest też szablonem dla nielicznych pól statycznych (sekcja 5). |
+| `dashboard/foodify-retencja.html` | Źródło artefaktu. |
 
-Artifact: `https://claude.ai/artifact/B25KPWGfbtcg3LzJjiyY2B`
-DB doc: `snapshot/current`. Always write it with `if_version`.
-Customer.io workspace: `190673`
-Tool: `mcp__Customer_io_Pstryk__cio_read_api`
+Artefakt: `https://claude.ai/artifact/B25KPWGfbtcg3LzJjiyY2B`. Baza: `snapshot/current` (zapis z `if_version`). Workspace Customer.io: `190673`. Narzędzie: `mcp__Customer_io_Pstryk__cio_read_api`.
 
----
+## 1. Procedura codzienna
 
-## 1. Procedure (minimum tokens)
+```
+python3 refresh/plan.py --reset      # nowy dzień: czyści liczniki i strony klientów, ustawia asof = dziś
+python3 refresh/plan.py              # lista wywołań (uruchamiaj ponownie, pokazuje tylko braki)
+...wykonaj wywołania, każdy wynik zapisz:  python3 refresh/put.py <ścieżka> '<wynik>'
+python3 refresh/build.py             # OK albo lista braków
+```
 
-1. **Counts.** For each `[k, f]` in `queries.json`:
-   - Call `GET /v1/environments/190673/customers` with `params={"filters": base64(compact_json(f)), "limit":1}` and `jq=".meta.pagination.total"`.
-   - Generate the base64 with a script: `python3 -c "import json,base64;[print(k,base64.b64encode(json.dumps(f,separators=(',',':')).encode()).decode()) for k,f in json.load(open('refresh/queries.json'))]"`.
-   - Make the calls **in parallel, about 25–40 at a time**. Append results to the file straight away as `counts[k]=n`. Never copy filters by hand.
-   - Filters support only `and`/`or`/`not` + `segment`, so everything is built on segments.
-   - Shortcut: if `appr.R5.0 == 0`, then `appr.R5.1..9 = 0` too.
-2. **Purchase sample** (`raw.sample`): 14 rows, one per day, covering the last 14 full days.
-   - Call `GET /v1/environments/190673/logs` with `type=event`, `name=purchase`, `limit=50`, `jq=refresh/sample.jq`. One page per day is enough.
-   - **`continuation` ignores the from/to window**, so pick the day by `timestamp`.
-   - Row fields: `{day,n,d,v,dv,t,ex,cb,tu,nu,codes,w,o,src,dd}`.
-3. **`purchases_yesterday`**: the full count of yesterday's purchases. Page through yesterday's logs and add the pages up (example: 50+50+50+50+45 = 245).
-   - Do not use `event_names/purchase.daily_count`: it counts today, which is incomplete.
-4. **`lead_series`**: `GET /metrics/segment_membership` for segment **551**, `resolution=days`, last 31 days. `e` = entered, `l` = left, `hist` = segment size.
-5. **`push_monthly`**: `/metrics/all_deliveries?version=2&res=months`, filtered to `type=="push"`.
-   - Full months only (drop the current one).
-   - Fields: `lab`, `s` (sent), `d` (delivered), `o` (opened), `cv` (converted).
-6. **`camp`**: `/campaigns/{157,158}/channel_metrics?period=days`. `steps` is ignored and 45 days come back; sum the days since the 800+ program started (28 Sep).
-   - `157.email = [delivered, opened, clicked, converted]`
-   - `158.push = [delivered, opened, null, converted]`
-7. Set `raw.asof` to today's date and run `python3 refresh/build.py`.
-8. Save the DB: `ArtifactData set snapshot/current file_path=refresh/snapshot.json if_version=<latest>`.
-9. Copy `dashboard/foodify-retencja.html` to the scratchpad. Run a Playwright test (expect 0 `pageerror`). Then `Artifact publish` with `url`.
-10. Commit and push.
+Potem:
+1. `ArtifactData set snapshot/current file_path=refresh/snapshot.json if_version=<ostatnia>`.
+2. Skopiuj `dashboard/foodify-retencja.html` do scratchpada i zrób test Playwright (0 błędów `pageerror`).
+3. `Artifact publish` z `url` artefaktu.
+4. Commit i push.
 
-## 2. Count dictionary (queries.json)
+Typy linii w `plan.py`:
 
-Segments:
-- `157`: app users
-- `551`: leads
-- `642..648`: order ladder (`642` = 1 order … `648` = 10+)
-- `649/650/651`: eating now (650+651 = ends within 7 days)
-- `655–657`: inactive
-- `143/145/146/147/149`: RFM R1..R5
-- `616`: sunset
-- `51`: email OK
-- `662–664, 682–684`: LTV buckets (LTV)
-- `636`: 800+ members
-
-| Key | Filter | Where in the dashboard |
+| Linia | Co | Zapis |
 |---|---|---|
-| `app.users/ios/android/op30/op7/pushCons/pushReach/buyApp30/buyWeb30/buyAppEver/buy30` | seg 157/737/738/709/736/523/198/733/734/735/676 | APP tiles |
-| `app.clients` / `app.clNo` | 157∧CL / ¬157∧CL (CL = or 642..648) | APP.cmp.cl |
-| `app.eat` / `app.eatNoApp` / `app.inact` / `app.o4` | 157∧ACT / ¬157∧ACT / 157∧or655–657 / 157∧O4 | APP |
-| `app.ltvA.X` / `app.ltvN.X` | 157∧X / ¬157∧X, X∈LTV | APP.cmp.ltvB |
-| `app.ordA.X` / `app.ordN.X` | 157∧X / ¬157∧X, X∈642..648 | APP.cmp.ordB; A+N for 648 = ladder 10+ |
-| `lead.*` | 551∧{537 open30, 552 click30, 549 atrisk, 425 sunCand, 616 sunsetted, 429 remove, 71 sms, 523 push, 157 app, 54 cart, 59 checkout, 100 engaged} | LEAD |
-| `lad.2..6`, `lad.ge6` | or(642..648), or(643..648), …, or(647,648) | STATIC.ladder ≥1…≥6 and STATIC.life[0..1] |
-| `seg.658..661` | time between orders | STATIC.gap |
-| `seg.671,672,675,673,674` | JJC, Wybór z Menu, Gotowe Diety, Kids, Foodpack | STATIC.prod |
-| `seg.act`, `seg.end7` | or649–651, or650–651 | STATIC.life[3..4] |
-| `p8.disc/w13/w45` | 636∧698, 636∧or692–694, 636∧or695–696 | P8 |
-| `emr.G` | G∧51∧¬616 | EMR |
-| `appr.G.j` | G∧157∧[—,650,651,ACT,652,653,654,655,656,657][j] | APPR (CHA=648, LOY=or645–647, POT=or643–644, NEW=642, R1..R5) |
-| `ltv.G.X` | G∧X | RAW.rfm/loy[].ltv |
+| `C klucz b64` | `GET /customers`, `filters=b64`, `limit=1`, `jq=.meta.pagination.total` | Zbieraj w paczki: `put.py counts '{"klucz":n,...}'` |
+| `M seg start ts_start ts_end jq=…` | `segment_membership`, `resolution=days` (domyślnie ostatnie 8 dni) | `put.py membership/<seg> '{"start":"<start>","v":<wynik>}'` |
+| `W 531` | `segment_membership`, `resolution=weeks` od 2026-07-09 | `put.py membership_weeks/531 '{"start":"2026-07-09","e":[…],"l":[…]}'` |
+| `S dzień` | logi zakupów z dnia (1 strona, `jq=sample.jq`) | `put.py sample/<dzień> '<wynik + "day">'` |
+| `P active_pages / sec_pages` | wszystkie strony klientów (649 oraz 643∧820), jq podany w planie | `put.py active_pages/<p> '<wynik>'` |
+| `K kampania okres` | `/campaigns/<id>/metrics` (dni: 8, tygodnie: 12, miesiące: 13) | dni: `put.py flows/metrics/<id>/d '{"end":"<dziś>","v":<wynik>}'`, w/m: `put.py flows/metrics/<id>/w '<wynik>'` |
+| `G dzień` | `goal_refresh` dla celów 2, 7, 10, 11, suma per kampania (`p:true` = ponów) | `put.py flows/goals/<dzień> '{"<cid>":[liczba,przychód]}'` |
+| `X` | push miesięcznie (`all_deliveries`), `channel_metrics` kampanii 157/158 | `push_monthly`, `camp` |
+| `purchases_yesterday` | wszystkie strony logów z wczoraj, licz po `timestamp` | `put.py purchases_yesterday N` |
 
-## 3. What build.py computes from the sample
+Jak oszczędzać tokeny:
+- Wywołania MCP puszczaj równolegle, po 25–40 naraz.
+- Wyniki zapisuj od razu, w paczkach.
+- Nie przepisuj ręcznie filtrów: kopiuj je z `plan.py`.
+- Jeśli kilka kluczy ma identyczny filtr, wystarczy jedno wywołanie. Przykład: `lb.buy1` = `lb.ev1`, `buy2` = `pg2`, `buy3` = `pg1`, `buy4` = `pg8`, `buy5` = `ev8`.
+- Gdy `appr.R5.0` = 0, pozostałe `appr.R5.*` też są 0.
 
-**RB:**
-- `n, d, v, dv`: sums over the 14 days.
-- `codes`: top 10 codes; the percentage comes from the code's suffix.
-- `loy`: [n, d] by how many orders the customer has (1 / 2–3 / 4+).
-- `w[k][4..7]`: [n, d, v, dv] per `wealth_index`.
-- `perDay`: `purchases_yesterday`.
+## 2. Co skąd (słownik)
 
-**CB:**
-- `n`, `nu` over the last 6 days. `nu` = orders with `spent_wallet_cashback > 0`.
-- `perDay`: `purchases_yesterday`.
+Segmenty:
+- 157: aplikacja
+- 551: leady
+- 642..648: klienci według liczby zamówień (642 = 1, 648 = 10+)
+- 649/650/651: jedzą teraz (650 = koniec za 0–3 dni, 651 = za 4–7 dni)
+- 652–657: dni od końca dostaw (0–7, 8–14, 15–30, 31–60, 61–90, 90+)
+- 814–818: koniec dostawy za 8–14, 15–21, 22–30, 31–60, 61–90 dni
+- 143/145/146/147/149: RFM R1..R5
+- 685: flaga churn
+- 531: nieaktywni (seria)
+- 636/689/688/687/686/690/639: program 800+
+- 720–732: cashback
+- 701–719: zdarzenia i strony leadów (30 dni)
+- 692–696: majętność 1–5
+- 698/700: zakup z rabatem (kiedykolwiek / 3+ razy)
+- 781–830: zakup w k dni
+- 822–829: 2+ zakupy w k dni
+- 831–836: churn per okres
 
-**STATIC:**
-- `days`: diet length (end − start + 1) in buckets 1 / 2–4 / 5–9 / 10–19 / 20+. `daysC` is the median.
-- `pay`: share of value paid externally (`spent_external`), with cashback+FoodiKarta, and with 800+ top-up (`spent_top_up`).
-- `payC`: AOV = `v/n`.
+| Element dashboardu | Źródło w raw | Logika w build.py |
+|---|---|---|
+| Karty segmentów (`RAW.rfm/loy`: tot, r[0..8], ltv, hist/e/l) | `raw.G.*`, `ltv.G.*`, membership 143–149 | r[9..12] przeskalowane proporcją tot; hist/e/l = ostatnie 30 dni |
+| Churn (`CHURN`) | `churn.*`, membership 531/655, weeks 531 | `lost30` = suma wejść do 655 przez 30 dni; `wk` = pełne tygodnie od czwartku |
+| Serie (`ACTIVE_T`, `CONS`, `SER`) | membership 528, 28/51/71/75/523, 488, 551, 636/639 | od stałych dat startu do dziś |
+| Leady (`LEAD`, `LB`) | `lead.*`, `lb.*`, membership 551 | e/l/hist = ostatnie 31 dni |
+| 800+ (`P8`) | `p8.*`, membership 636/639, `camp` | `day` od 28 wrz |
+| Cashback (`CB`) | `cb.*`, próbka | n/nu = ostatnie 6 dni próbki; `days` = [naliczony, wydany, n] na dzień |
+| Rabaty (`RB`) | `rb.w*`, próbka | 14 dni próbki; `days` = [% z kodem, % top-up] na dzień; top10 kodów |
+| Status bazy, drabina, produkty (`STATIC`) | `lad.*`, `seg.*`, `app.buy30`, próbka | pay = udział wartości; AOV = v/n; mediana długości diety |
+| Aplikacja (`APP`, `APPR`) | `app.*`, `appr.*`, próbka (źródło), `push_monthly` | |
+| Zasięg e-mail (`EMR`) | `emr.*` | |
+| Nowi klienci (`NK`, `NCR`, `NCSEC`, `WT`) | `nk.*`, `active_pages`, `sec_pages` | NK = P1(642) + P2(643) w oknach; NCSEC = drugie zamówienie w trakcie diety |
+| Dni dostaw (`DMAP`) | `dmap.*`, `raw.G.0/1` | |
+| Churn rate (`CHURNP`) | `churnp.*` | [odpłynęli, aktywni na początku] dla 1/7/90 dni |
+| Kampanie (`FLOWS`) | `flows.metrics`, `flows.goals`, `flows.meta` | od 2026-09-01; konwersje i przychód z celów 2/7/10/11 |
 
-**APP.cmp.ord/val/code:** order count, value and orders with a code, app (ios|android) vs web, over the last 6 days.
+## 3. Kontrole po build.py
 
-## 4. Not yet covered by build.py
+- `WT` ≈ poprzedni dzień (±kilka), `NCR` ma kilkaset wierszy.
+- `CHURN.wk` ma tylko pełne tygodnie. Ostatni tydzień zaczyna się w czwartek ≥ 7 dni temu.
+- `RAW.rfm[*].hist[-1]` = `raw.R*.tot`.
+- Playwright: brak `pageerror`.
 
-These are updated by hand, following `docs/SZCZEGOLY_ZRODEL.md`.
+## 4. Pułapki
 
-| Element | When |
-|---|---|
-| `FLOWS`, `NCR`, `NK`, `WT`, `DMAP`, `CHURNP`, `SER`, `CHURN.d`, `RB.days`, `CB.days` | daily. **TODO: move into build.py** (raw: `membership[seg]`, daily logs) |
-| `CHURN.wk`: seg 531, weekly resolution (weeks start Thursday), full weeks only | weekly |
-| `MOM`: calendar-month comparison | on the 1st of the month |
-| `NCSEC`: paging over 643 customers with a first order in the last 30 days | monthly |
+- Logi: `continuation` ignoruje okno from/to, więc dzień wybieraj po `timestamp`. `event_names.daily_count` to dzień bieżący.
+- `channel_metrics` ignoruje `steps` i zwraca 45 dni.
+- `segment_membership` w resolution `weeks`: pierwszy kubełek bywa niepełny (dlatego start od 2026-07-09, a build go pomija).
+- W HTML jest `try{applyData(d)` przed `try{applyData({`. build.py podmienia właściwe miejsce.
+- Routines nie mogą mieć connectorów w tej organizacji, więc przycisk „Zaktualizuj” nie odświeży danych sam.
 
-## 5. Gotchas
+## 5. Poza build.py (świadomie)
 
-- In the HTML, search for `try{applyData({` (`try{applyData(d)` appears earlier). build.py does this itself.
-- `attribute_change … within` in segments is ignored, so RFM transitions cannot be counted with segments.
-- This org does not allow connectors on Routines, so the "Zaktualizuj" button cannot run anything automatically. An LLM refreshes using this guide.
-- `goal_refresh` that returns `p:true`: poll again.
+| Element | Dlaczego | Kiedy |
+|---|---|---|
+| `MOM` (porównanie miesięcy) | Liczony raz na miesiąc z pełnego miesiąca kalendarzowego. Definicje w `docs/SZCZEGOLY_ZRODEL.md`. | 1. dnia miesiąca (następnie 1 listopada) |
+| `INC` | Inkrementalność liczona na żywo w przeglądarce (connector). | — |
+| Etykiety, kolory, `STATIC.gapC` | Stałe opisowe. | — |
