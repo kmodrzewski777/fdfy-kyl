@@ -193,6 +193,16 @@ for p in raw['active_pages'].values():
     for g, n in p['w']: WT[g] += n
     NCR += p['n']
 WT = {'R%d' % (g + 1): WT.get(g, 0) for g in range(5)}
+# Czekający: ile dni do startu pierwszej dostawy (strony 649, pole wait_days: [grupa, dni do startu])
+WAITB = None
+if raw.get('wait_days'):
+    WB = collections.defaultdict(lambda: [0, 0, 0])
+    for p in raw['wait_days'].values():
+        for g, d in p:
+            if g > 4: continue
+            WB['R%d' % (g + 1)][0 if d <= 3 else 1 if d <= 7 else 2] += 1
+    WAITB = {k: WB[k] for k in ('R1', 'R2', 'R3', 'R4', 'R5')}
+    WT = {k: sum(v) for k, v in WAITB.items()}
 NCR.sort(key=lambda r: (-r[0], r[1]))
 # NCSEC: 2. zamówienie w trakcie diety z 1. zamówienia (klienci 643, 1. zamówienie w 30 dni)
 den = sum(p[0] for p in raw['sec_pages'].values()); dur = sum(p[1] for p in raw['sec_pages'].values())
@@ -226,7 +236,7 @@ hist = raw.setdefault('seg_hist', {}); hist[raw['asof']] = row
 json.dump(raw, open(os.path.join(D, 'raw.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
 SEGH = {'dates': sorted(hist)[-90:]}
 SEGH['v'] = {g: [hist[d].get(g) for d in SEGH['dates']] for g in list(HG) + ['all']}
-s['H'] = {'SEGH': SEGH, 'EMR': EMR, 'APPR': APPR, 'CHURNP': CHURNP, 'WT': WT, 'NCR': NCR, 'NK': NK, 'NCSEC': NCSEC, 'FLOWS': FLOWS,
+s['H'] = {'SEGH': SEGH, 'WAITB': WAITB, 'EMR': EMR, 'APPR': APPR, 'CHURNP': CHURNP, 'WT': WT, 'NCR': NCR, 'NK': NK, 'NCSEC': NCSEC, 'FLOWS': FLOWS,
           'DMAP': {'asof': raw['asof'], 'b': DMAP_B, 'g': {g: [NAMES[g], dm[g]] for g in NAMES}}}
 s['asOf'] = raw['asof']; s['updatedAt'] = int(time.time() * 1000); s['v'] = 1
 json.dump(s, open(os.path.join(D, 'snapshot.json'), 'w'), ensure_ascii=False)

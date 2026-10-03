@@ -1635,7 +1635,7 @@ function onbCard(){const S=SCOPE||0,c0=-(S||9999)-CUT,c1=-1-CUT,R=NCR.filter(r=>
  const z=(l,v,pc,cls,st)=>`<div data-noseg="1" class="kp zk ${cls||''}"><span class="eyebrow">${l}</span><div class="zk-n"><span class="big" style="${st||''}">${f(v)}</span>${pc?`<em class="zk-p">${pc}</em>`:''}</div></div>`;
  return `<div class="sx onb" style="--c:#9ca3af"><div class="sx-id"><span class="nm">Onboarding</span><span class="df">1. zamówienie</span><span class="tt">${f(T)}</span></div>
   <div class="zcols">${z('Jedzą',eat.length,pf(eat.length,T),'grad')}${z('Czekają na start',wait,pf(wait,T))}${z('Koniec ≤7 dni',end7,pf(end7,T),'','color:var(--orange)')}${z('2. zamówienie',NCSEC[0],pf(NCSEC[0],NCSEC[1]))}</div></div>`;}
-let SEGH={dates:[],v:{}};
+let SEGH={dates:[],v:{}},WAITB=null;
 // seria kafla: g = R1..R5/CHA/LOY/POT/NEW/all, i: 0 czekają, 1 aktywni, 2 zagrożeni, 3 nieaktywni
 const SHser=(g,i)=>(SEGH.v[g]||[]).map(r=>r?r[i]:null).filter(v=>v!=null);
 function spk(a,col,light){if(a.length<2)return `<div class="spk0">wykres od ${SEGH.dates[0]?dfmt(new Date(SEGH.dates[0]+'T00:00:00Z')):'dziś'}</div>`;
@@ -1656,7 +1656,7 @@ function renderGX(){
   const T=g.tot*share(g);
   const mom=MOM.rfm[g.k]?dl(...MOM.rfm[g.k]):g.k==='NEW'?dl(...MOM.newc).replace('m/m','nowych m/m'):g.k==='POT'?dl(...MOM.second).replace('m/m','wejść m/m'):'';
   const wv=Math.round(((typeof WT==='object'&&WT[g.k])||0)*share(g));
-  const wtile=`<div data-noseg="1" class="kp zk wt ${g.k==='R5'?'zoff':''}"><span class="eyebrow">Czekają na start</span><div class="zk-n"><span class="big">${f(wv)}</span><em class="zk-p">${pf(wv,T)}</em></div><div class="spr">${spk(SHser(g.k,0),cssv('--magenta'))}</div><div class="kb"><div class="wtx">zamówili, dostawa jeszcze się nie zaczęła</div></div><span class="kf">${wv?'pierwsza dostawa w przyszłości':'nikt nie czeka'}</span></div>`;
+  const wtile=`<div data-noseg="1" class="kp zk wt ${g.k==='R5'?'zoff':''}"><span class="eyebrow">Czekają na start</span><div class="zk-n"><span class="big">${f(wv)}</span><em class="zk-p">${pf(wv,T)}</em></div><div class="spr">${spk(SHser(g.k,0),cssv('--magenta'))}</div><div class="kb">${(()=>{const b=(WAITB&&WAITB[g.k]||[0,0,0]).map(v=>Math.round(v*share(g))),mx=Math.max(...b,1),cl=[cssv('--magenta'),cssv('--a1'),cssv('--a2')];return `<div class="qrows">${[['za 1–3 dni',b[0]],['za 4–7 dni',b[1]],['za 8+ dni',b[2]]].map(([l,q],i)=>`<div class="qr"><span class="ql">${l}</span><span class="qt"><em style="width:${q>0?Math.max(2,q/mx*100):0}%;background:${cl[i]}"></em></span><b>${f(q)}</b><small>${pf(q,T)}</small></div>`).join('')}</div>`;})()}</div><span class="kf">${wv?'start pierwszej dostawy w przyszłości':'nikt nie czeka'}</span></div>`;
   const zs=[0,1,2].map(z=>{const sts=ST.filter(s=>s.z===z),v=sts.reduce((x,s)=>x+val(g,s.k),0);
    const W=z===0?['#ffffff','#ffffff','#ffffff']:sts.map(s=>cssv(s.c));
    const lab=t=>t.n.replace('Bez dostawy ','').replace('Kończy się ','').replace('Dostawa trwa','trwa 8+ dni');
@@ -2035,7 +2035,7 @@ const DKEYS=['APP','RAW','ACTIVE_T','MOM','CHURN','LEAD','P8','RB','SER','STATIC
 function applyData(d){if(!d||typeof d!=='object')return false;let ok=false;
  const set={APP:v=>APP=v,CONS:v=>CONS=v,LB:v=>LB=v,CB:v=>CB=v,RAW:v=>RAW=v,ACTIVE_T:v=>ACTIVE_T=v,MOM:v=>MOM=v,CHURN:v=>CHURN=v,LEAD:v=>LEAD=v,P8:v=>P8=v,RB:v=>RB=v,SER:v=>SER=v,STATIC:v=>STATIC=v};
  DKEYS.forEach(k=>{if(d[k]&&typeof d[k]==='object'){set[k](d[k]);ok=true;}});
- if(d.H&&typeof d.H==='object'){const H=d.H,hs={SEGH:v=>SEGH=v,EMR:v=>EMR=v,APPR:v=>APPR=v,CHURNP:v=>CHURNP=v,WT:v=>WT=v,NCR:v=>NCR=v,NK:v=>NK=v,NCSEC:v=>NCSEC=v,DMAP:v=>DMAP=v,FLOWS:v=>FLOWS=v};Object.keys(hs).forEach(k=>{if(H[k]!=null){hs[k](H[k]);ok=true;}});}
+ if(d.H&&typeof d.H==='object'){const H=d.H,hs={SEGH:v=>SEGH=v,WAITB:v=>WAITB=v,EMR:v=>EMR=v,APPR:v=>APPR=v,CHURNP:v=>CHURNP=v,WT:v=>WT=v,NCR:v=>NCR=v,NK:v=>NK=v,NCSEC:v=>NCSEC=v,DMAP:v=>DMAP=v,FLOWS:v=>FLOWS=v};Object.keys(hs).forEach(k=>{if(H[k]!=null){hs[k](H[k]);ok=true;}});}
  if(typeof d.asOf==='string'){ASOF=d.asOf;END=D0(d.asOf);}
  if(ok)prep();const el=document.getElementById('asof');if(el){el.dataset.live='1';el.textContent='Dane z '+(d.updatedAt?new Date(d.updatedAt).toLocaleString('pl-PL',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Warsaw'}):new Date(D0(ASOF)).toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}));}return ok;}
 (async()=>{const fb=(why)=>{const m=document.getElementById('rf-msg');if(m&&!m.textContent)m.textContent=why||'brak połączenia z bazą, pokazuję dane wbudowane';};try{if(typeof claude==='undefined'){fb();return;}const db=await claude.use('db');if(!db){fb();return;}PINDB=db;

@@ -7,7 +7,7 @@ raw = json.load(open(F)); args = [a for a in sys.argv[1:] if not a.startswith('-
 D0 = dt.date.fromisoformat(args[0]) if args else dt.date.today()
 ts = lambda d: int(dt.datetime(d.year, d.month, d.day, tzinfo=dt.timezone.utc).timestamp())
 if '--reset' in sys.argv:
-    for k in ('counts', 'active_pages', 'sec_pages'): raw[k] = {}  # historia (membership, sample, flows) zostaje
+    for k in ('counts', 'active_pages', 'sec_pages', 'wait_days'): raw[k] = {}  # historia (membership, sample, flows) zostaje
     raw['asof'] = str(D0); json.dump(raw, open(F, 'w'), ensure_ascii=False, separators=(',', ':'))
 E = 'path=/v1/environments/190673'
 print('# 1. LICZNIKI  ->  put.py counts \'{"klucz":n,...}\'   (jq .meta.pagination.total, limit 1)')
@@ -46,14 +46,15 @@ print('\n# 4. STRONY KLIENTÓW  %s/customers params={filters:<b64>,limit:50,page
 B, M0, T30 = int(dt.datetime.now().timestamp()), ts(D0), ts(D0) - 30 * 86400
 JA = ('def d(x): ((x-%d)/86400|floor); [.customers[]|.attributes|((.active_diets//"[]"|fromjson? // []|map(.start_date|tonumber)|min)//0) as $s|'
       '{g:(((.rfm_total_score|tonumber?)//0)|if .>=14 then 0 elif .>=11 then 1 elif .>=8 then 2 elif .>=5 then 3 elif .>=3 then 4 else 5 end),w:($s>%d),'
-      'o:((.lifetime_orders|tonumber?)//0),n:[d((.first_order_at|tonumber?)//0),d(if $s>0 then $s else %d end),((.total_days_count|tonumber?)//0)]}] as $a|'
-      '{w:([$a[]|select(.w)|.g]|group_by(.)|map([.[0],length])),n:[$a[]|select(.o==1)|.n]}|tojson') % (M0, B, M0)
+      'o:((.lifetime_orders|tonumber?)//0),s:d($s),n:[d((.first_order_at|tonumber?)//0),d(if $s>0 then $s else %d end),((.total_days_count|tonumber?)//0)]}] as $a|'
+      '{w:([$a[]|select(.w)|.g]|group_by(.)|map([.[0],length])),wd:[$a[]|select(.w)|[.g,.s]],n:[$a[]|select(.o==1)|.n]}|tojson') % (M0, B, M0)
 JS = ('[.customers[]|.attributes|select(((.first_order_at|tonumber?)//0)>=%d)|((.last_order_at|tonumber?)//0) as $lo|'
       '(.active_diets//"[]"|fromjson? // [])|any(.[];(.start_date|tonumber)<$lo and $lo<=((.end_date|tonumber)+86400))]|[length,(map(select(.))|length)]|tojson') % T30
 for key, seg, jq in (('active_pages', {"segment": {"id": 649}}, JA), ('sec_pages', {"and": [{"segment": {"id": 643}}, {"segment": {"id": 820}}]}, JS)):
     f = base64.b64encode(json.dumps(seg, separators=(',', ':')).encode()).decode()
     print('P %s seg=%s filters=%s  strony 1..ceil(total/50) (total = pierwsza strona .meta.pagination.total)  ->  put.py %s/<p> \'<wynik>\'' % (key, json.dumps(seg), f, key))
     print('  jq:', jq)
+print('P wait_days seg=649 te same strony co active_pages, jq: [.customers[]|.attributes|((.active_diets//"[]"|fromjson? // []|map(.start_date|tonumber)|min)//0) as $s|select($s>%d)|[(((.rfm_total_score|tonumber?)//0)|if .>=14 then 0 elif .>=11 then 1 elif .>=8 then 2 elif .>=5 then 3 elif .>=3 then 4 else 5 end),(($s-%d)/86400|floor)]]|tojson  ->  put.py wait_days \'{"<p>":<wynik>}\'' % (B, M0))
 print('\n# 5. KAMPANIE (FLOWS)')
 st = dt.date.fromisoformat(raw['flows']['start']); nd = (D0 - st).days + 1
 for cid, m in raw['flows']['meta'].items():
