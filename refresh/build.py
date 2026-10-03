@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""raw.json (surowe wyniki Customer.io) -> snapshot.json + dashboard HTML.
+"""raw.json (surowe wyniki Customer.io) -> snapshot.json (jeden dokument do bazy artefaktu). HTML się nie zmienia.
 Cała logika prezentacji jest tutaj. LLM nic nie liczy ręcznie:
   python3 refresh/plan.py --reset   -> wykonaj wypisane wywołania, zapisuj put.py
   python3 refresh/build.py          -> przelicza WSZYSTKO
 """
 import json, re, collections, statistics, os, sys, math, time, datetime as dt
 D = os.path.dirname(os.path.abspath(__file__))
-HTML = os.path.join(D, '..', 'dashboard', 'foodify-retencja.html')
 raw = json.load(open(os.path.join(D, 'raw.json')))
 s = json.load(open(os.path.join(D, 'snapshot.json')))  # szablon: pola nieliczone tu (MOM, konfiguracja) zostają bez zmian
 C = raw['counts']
@@ -155,8 +154,6 @@ P['day'] = {'e': series(636, '2026-09-28', 0), 'b': series(639, '2026-09-28', 0)
             'lab': [lab(st8 + dt.timedelta(i)) for i in range(n8)]}
 cm = raw['camp']; P['camp'][0][2:6] = cm['157']['email']; P['camp'][1][2:6] = cm['158']['push']
 
-s['asOf'] = raw['asof']; s['updatedAt'] = int(time.time() * 1000); s['v'] = 1
-json.dump(s, open(os.path.join(D, 'snapshot.json'), 'w'), ensure_ascii=False)
 
 # =================== stałe HTML ===================
 LTV = (662, 663, 664, 682, 683, 684); ORD = (642, 643, 644, 645, 646, 647, 648)
@@ -210,35 +207,15 @@ for cid, mt in FL['meta'].items():
     c['mw'] = mm['w'] if mm else None; c['mm'] = mm['m'] if mm else None
     FC[cid] = c
 FLOWS = {'start': FL['start'], 'days': nd, 'c': FC}
-
-h = open(HTML).read()
-def js(o): return json.dumps(o, ensure_ascii=False, separators=(',', ':'))
-def jsk(o):  # obiekt z kluczami liczbowymi bez cudzysłowów (jak w kodzie strony)
-    return re.sub(r'"(\d+)":', r'\1:', js(o)).replace('null', 'null')
-def sub(pat, rep):
-    global h
-    h, n = re.subn(pat, lambda m: rep, h, count=1, flags=re.S)
-    if n != 1: sys.exit('Nie znaleziono w HTML: ' + pat)
-def subjson(prefix, obj, skip=0):
-    """Podmienia literał JSON zaczynający się po `prefix` (parser, nie regex); skip = ile znaków prefiksu jest częścią literału."""
-    global h
-    i = h.index(prefix) + len(prefix) - skip; _, n = json.JSONDecoder().raw_decode(h[i:])
-    h = h[:i] + js(obj) + h[i + n:]
-sub(r'let APP=\{.*?\}\};\n', 'let APP=' + js(APP) + ';\n')
-sub(r'EMR=\{[^}]*\}', 'EMR=' + js(EMR))
-sub(r'APPR=\{.*?\};', 'APPR=' + js(APPR) + ';')
-sub(r'NK=\{.*?\},NCSEC=\[[^\]]*\]', 'NK=' + jsk(NK) + ',NCSEC=' + js(NCSEC))
-sub(r'CHURNP=\{.*?\}\};', 'CHURNP=' + jsk(CHURNP) + ';')
-sub(r'WT=\{R1:[^}]*\}', 'WT=' + re.sub(r'"(R\d)":', r'\1:', js(WT)))
-subjson('NCR=', NCR)
-subjson('FLOWS=', FLOWS)
-h, n = re.subn(r"(function renderNC\(\)\{.*?t0=D0\(')\d{4}-\d{2}-\d{2}('\))", lambda m: m.group(1) + raw['asof'] + m.group(2), h, count=1, flags=re.S)
-if n != 1: sys.exit('Nie znaleziono t0 w renderNC')
 NAMES = {'all': 'Wszyscy', 'R1': 'Czempioni', 'R2': 'Lojalni', 'R3': 'Obiecujący', 'R4': 'Okazjonalni', 'R5': 'Utraceni'}
-h, n = re.subn(r"DMAP=\{asof:'[\d-]+'", "DMAP={asof:'%s'" % raw['asof'], h, count=1)
-for g, nm in NAMES.items():
-    h, n2 = re.subn(r"(DMAP=\{.*?\b%s:\['%s',)\[[^\]]*\]" % (g, nm), lambda m: m.group(1) + js(dm[g]), h, count=1, flags=re.S)
-    if n2 != 1: sys.exit('DMAP: brak grupy ' + g)
-subjson('try{applyData({', s, skip=1)  # nie 'try{applyData(' — wcześniej jest try{applyData(d)
-open(HTML, 'w').write(h)
-print('OK', raw['asof'], '| RB.n', RB['n'], '| LEAD.tot', L['tot'], '| NCR', len(NCR), '| WT', WT, '| NCSEC', NCSEC, '| FLOWS.days', nd)
+DMAP_B = [['0–3', 0, 3, 650], ['4–7', 4, 7, 651], ['8–14', 8, 14, 814], ['15–21', 15, 21, 815], ['22–30', 22, 30, 816], ['31–60', 31, 60, 817], ['61+', 61, 90, 818]]
+
+# Wszystko trafia do jednego dokumentu w bazie (snapshot/current). HTML NIE jest zmieniany —
+# strona przy otwarciu czyta dane z bazy (applyData: klucze snapshotu + s['H']) i sama się przelicza/renderuje.
+s['APP'] = APP
+s['H'] = {'EMR': EMR, 'APPR': APPR, 'CHURNP': CHURNP, 'WT': WT, 'NCR': NCR, 'NK': NK, 'NCSEC': NCSEC, 'FLOWS': FLOWS,
+          'DMAP': {'asof': raw['asof'], 'b': DMAP_B, 'g': {g: [NAMES[g], dm[g]] for g in NAMES}}}
+s['asOf'] = raw['asof']; s['updatedAt'] = int(time.time() * 1000); s['v'] = 1
+json.dump(s, open(os.path.join(D, 'snapshot.json'), 'w'), ensure_ascii=False)
+print('OK', raw['asof'], '| RB.n', RB['n'], '| LEAD.tot', L['tot'], '| NCR', len(NCR), '| WT', WT, '| NCSEC', NCSEC, '| FLOWS.days', nd,
+      '| rozmiar dokumentu %.0f KB' % (len(json.dumps(s, ensure_ascii=False).encode()) / 1024))

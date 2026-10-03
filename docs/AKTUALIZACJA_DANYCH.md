@@ -3,8 +3,10 @@
 **Zasada:** cała logika dashboardu jest zakodowana w `refresh/build.py`. LLM przy aktualizacji niczego nie liczy ani nie interpretuje. Pobiera tylko surowe wyniki z Customer.io (według listy z `plan.py`), zapisuje je do `raw.json` przez `put.py` i uruchamia `build.py`.
 
 ```
-plan.py ──▶ (wywołania MCP Customer.io) ──put.py──▶ raw.json ──build.py──▶ snapshot.json + dashboard/foodify-retencja.html
+plan.py ──▶ (wywołania MCP Customer.io) ──put.py──▶ raw.json ──build.py──▶ snapshot.json ──ArtifactData──▶ baza artefaktu ──▶ przeglądarka
 ```
+
+**Strona (HTML) jest stała i NIE jest publikowana przy aktualizacji danych.** Przy otwarciu przeglądarka czyta dokument `snapshot/current` z bazy artefaktu (`applyData`): klucze snapshotu oraz `H` (stałe: `EMR`, `APPR`, `CHURNP`, `WT`, `NCR`, `NK`, `NCSEC`, `DMAP`, `FLOWS`) i sama renderuje wszystkie liczby i wykresy. Otwarta strona wykrywa nowy zapis w bazie i sama się przeładowuje. Dane wbudowane w HTML służą tylko jako awaryjny podgląd, gdy baza nie odpowiada. Nowa wersja strony jest potrzebna wyłącznie przy zmianie wyglądu albo logiki.
 
 | Plik | Rola |
 |---|---|
@@ -13,7 +15,7 @@ plan.py ──▶ (wywołania MCP Customer.io) ──put.py──▶ raw.json �
 | `refresh/put.py` | Jedyny sposób zapisu do `raw.json`. Serie dzienne i metryki kampanii scala po datach, więc historia zostaje. |
 | `refresh/raw.json` | Tylko surowe dane z API plus skumulowana historia (członkostwo segmentów, cele kampanii, próbki zamówień). |
 | `refresh/sample.jq` | jq: jedna strona logów zakupów → jeden wiersz próbki. |
-| `refresh/build.py` | Przelicza **wszystko**: snapshot oraz stałe w HTML (`APP`, `EMR`, `APPR`, `NK`, `NCSEC`, `CHURNP`, `WT`, `NCR`, `DMAP`, `FLOWS`, `renderNC t0`, osadzony `try{applyData({…})`). Przy brakach przerywa i wypisuje, czego brakuje. |
+| `refresh/build.py` | Przelicza **wszystko** do jednego dokumentu `snapshot.json` (ok. 40 KB, w tym `APP` i `H`). Nie dotyka HTML. Przy brakach przerywa i wypisuje, czego brakuje. |
 | `refresh/snapshot.json` | Wynik. Jest też szablonem dla nielicznych pól statycznych (sekcja 5). |
 | `dashboard/foodify-retencja.html` | Źródło artefaktu. |
 
@@ -29,10 +31,8 @@ python3 refresh/build.py             # OK albo lista braków
 ```
 
 Potem:
-1. `ArtifactData set snapshot/current file_path=refresh/snapshot.json if_version=<ostatnia>`.
-2. Skopiuj `dashboard/foodify-retencja.html` do scratchpada i zrób test Playwright (0 błędów `pageerror`).
-3. `Artifact publish` z `url` artefaktu.
-4. Commit i push.
+1. `ArtifactData set snapshot/current file_path=refresh/snapshot.json if_version=<ostatnia>`. **To koniec aktualizacji: bez publikowania strony.**
+2. Commit i push (`refresh/raw.json`, `refresh/snapshot.json`).
 
 Typy linii w `plan.py`:
 
@@ -105,7 +105,6 @@ Segmenty:
 - Logi: `continuation` ignoruje okno from/to, więc dzień wybieraj po `timestamp`. `event_names.daily_count` to dzień bieżący.
 - `channel_metrics` ignoruje `steps` i zwraca 45 dni.
 - `segment_membership` w resolution `weeks`: pierwszy kubełek bywa niepełny (dlatego start od 2026-07-09, a build go pomija).
-- W HTML jest `try{applyData(d)` przed `try{applyData({`. build.py podmienia właściwe miejsce.
 - Routines nie mogą mieć connectorów w tej organizacji, więc przycisk „Zaktualizuj” nie odświeży danych sam.
 
 ## 5. Poza build.py (świadomie)
