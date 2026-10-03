@@ -170,6 +170,10 @@ APP = dict(
     **{k: C['app.' + k] for k in ('users', 'ios', 'android', 'op30', 'op7', 'pushCons', 'pushReach', 'clients', 'o4',
                                   'eat', 'eatNoApp', 'inact', 'buy30', 'buyApp30', 'buyWeb30', 'buyAppEver')},
     push=dict(lab=pm['lab'], sent=pm['s'], **{'del': pm['d']}, open=pm['o'], conv=pm['cv']))
+# Osiągalni pushem = zgoda na push × realny odsetek dostarczeń pushy w ostatnim pełnym miesiącu
+# (segment 198 zawyża: tokeny wygasłe / odinstalowana aplikacja; broadcast 357: 3324 wysł. → 1242 dostarcz.)
+APP['pushRate'] = round(pm['d'][-1] / pm['s'][-1], 4) if pm['s'][-1] else None
+APP['pushReach'] = round(C['app.pushCons'] * APP['pushRate']) if APP['pushRate'] else C['app.pushReach']
 EMR = {g: C['emr.' + g] for g in ('R1', 'R2', 'R3', 'R4', 'R5')}
 APPR = {g: [C['appr.%s.%d' % (g, j)] for j in range(10)] for g in ('CHA', 'LOY', 'POT', 'NEW', 'R1', 'R2', 'R3', 'R4', 'R5')}
 
@@ -207,7 +211,7 @@ for cid, mt in FL['meta'].items():
     c['mw'] = mm['w'] if mm else None; c['mm'] = mm['m'] if mm else None
     FC[cid] = c
 FLOWS = {'start': FL['start'], 'days': nd, 'c': FC}
-NAMES = {'all': 'Wszyscy', 'R1': 'Czempioni', 'R2': 'Lojalni', 'R3': 'Obiecujący', 'R4': 'Okazjonalni', 'R5': 'Utraceni'}
+NAMES = {'all': 'Wszyscy', 'R1': 'Czempioni', 'R2': 'Lojalni', 'R3': 'Obiecujący', 'R4': 'Okazjonalni', 'R5': 'Niska wartość'}
 DMAP_B = [['0–3', 0, 3, 650], ['4–7', 4, 7, 651], ['8–14', 8, 14, 814], ['15–21', 15, 21, 815], ['22–30', 22, 30, 816], ['31–60', 31, 60, 817], ['61+', 61, 90, 818]]
 
 # Wszystko trafia do jednego dokumentu w bazie (snapshot/current). HTML NIE jest zmieniany —
