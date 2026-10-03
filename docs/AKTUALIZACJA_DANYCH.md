@@ -95,6 +95,7 @@ Segmenty:
 | Churn rate (`CHURNP`) | `churnp.*` | [odpłynęli, aktywni na początku] dla 1/7/90 dni |
 | Weekend (`WKD`) | `orders_day`, `wk_sched` | zamówienia per dzień tygodnia (do 56 dni); dostawy w 2 najbliższe weekendy = najnowsze zdarzenie harmonogramu per dieta (osoby = unikalni klienci) |
 | Czekający (`WAITB`), historia kafli (`SEGH`) | `wait_days`, `seg_hist` | kubełki 1–3 / 4–7 / 8+ dni do startu; historia dopisywana codziennie od 2026-10-03 |
+| Karty segmentów (`SEGX`) | `sg.<R>.*` (28 liczników × 5 segmentów: zamówienia, zakupy 7–90 dni, rabaty, 800+, majętność, e-mail, aplikacja) | podstrona `#karta-R1..R5`; rekomendacje liczone w przeglądarce z progów |
 | Kampanie (`FLOWS`) | `flows.metrics`, `flows.goals`, `flows.meta` | od 2026-09-01; konwersje i przychód z celów 2/7/10/11 |
 
 ## 3. Kontrole po build.py
