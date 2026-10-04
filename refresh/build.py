@@ -16,7 +16,7 @@ day = lambda x: dt.date.fromisoformat(x)
 
 # ---------- walidacja kompletności ----------
 err = []
-err += ['counts:' + k for k, _ in json.load(open(os.path.join(D, 'queries.json'))) if k not in C]
+err += ['counts:' + k for k, _ in json.load(open(os.path.join(D, 'queries.json'))) if k not in C and '@' not in k]  # warianty filtrów (@) sprawdzane osobno: filtr włączany tylko gdy komplet
 MEMB = ['528', '28', '51', '71', '75', '523', '488', '551', '636', '639', '531', '143', '145', '146', '147', '149', '655']
 err += ['membership:' + m for m in MEMB if m not in raw.get('membership', {})]
 if '531' not in raw.get('membership_weeks', {}): err.append('membership_weeks:531')
@@ -336,7 +336,7 @@ def dser(seg, k, d0):
     return o
 c642 = dt.datetime.utcfromtimestamp(raw['seg_created']['642']).date() + dt.timedelta(1)
 s['H']['SEC2'] = {'start': str(c642), 'sec': dser(642, 'l', c642), 'first': dser(642, 'e', c642),
-                  'n1': C['cbo.0.tot'], 'in1': C['cbo.0.in']}
+                  'n1': C['cbo.0.tot'], 'in1': C['cbo.0.in'], 'oneStart': str(c642 - dt.timedelta(1)), 'one': dser(642, 't', c642 - dt.timedelta(1)) + [C['cbo.0.tot']]}
 i531 = day(raw['membership']['531']['start'])
 s['H']['INA'] = {'start': str(i531), 'e': dser(531, 'e', i531), 'l': dser(531, 'l', i531), 't': dser(531, 't', i531),
                  'ch': {k: C['in.' + k] for k in ('email', 'sms', 'push', 'app')}, 'n745': C.get('seg.745') or (raw['membership']['745']['t'] or [None])[-1]}
