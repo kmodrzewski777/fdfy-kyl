@@ -269,8 +269,22 @@ row['all'] = [sum(row[g][k] or 0 for g in ('R1', 'R2', 'R3', 'R4', 'R5')) for k 
 hist = raw.setdefault('seg_hist', {}); hist[raw['asof']] = row
 WKD['act'] = row['all'][1]  # aktywni (jedzą teraz) jako mianownik udziału
 json.dump(raw, open(os.path.join(D, 'raw.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
-SEGH = {'dates': sorted(hist)[-90:]}
-SEGH['v'] = {g: [hist[d].get(g) for d in SEGH['dates']] for g in list(HG) + ['all']}
+# suma wszystkich segmentów: strefy z dziennej historii segmentów (od dnia po utworzeniu), uzupełnione pomiarami z odświeżeń
+ZH = {}
+for zi, sg in ((1, 649), (2, 744), (3, 745)):
+    m = raw['membership'].get(str(sg)); c0 = dt.datetime.utcfromtimestamp(raw['seg_created'][str(sg)]).date()
+    if not m: continue
+    st = day(m['start'])
+    for i, v in enumerate(m['t'] or []):
+        d_ = st + dt.timedelta(i)
+        if v is not None and c0 <= d_ <= D0: ZH.setdefault(str(d_), {})[zi] = v
+SEGH = {'dates': sorted(set(hist) | set(ZH))[-90:]}
+SEGH['v'] = {g: [hist[d].get(g) if d in hist else None for d in SEGH['dates']] for g in HG}
+SEGH['v']['all'] = []
+for d in SEGH['dates']:
+    r = list(hist[d]['all']) if d in hist else [None, None, None, None]
+    for zi, v in ZH.get(d, {}).items(): r[zi] = v
+    SEGH['v']['all'].append(r)
 s['H'] = {'RET90': C.get('ret90.all', 0), 'SEGX': SEGX, 'WKD': WKD, 'SEGH': SEGH, 'WAITB': WAITB, 'EMR': EMR, 'APPR': APPR, 'CHURNP': CHURNP, 'WT': WT, 'NCR': NCR, 'NK': NK, 'NCSEC': NCSEC, 'FLOWS': FLOWS,
           'DMAP': {'asof': raw['asof'], 'b': DMAP_B, 'g': {g: [NAMES[g], dm[g]] for g in NAMES}}}
 # ---------- GR (Gryzy: points_value + event gadget_earned) ----------
