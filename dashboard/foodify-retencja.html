@@ -1358,6 +1358,10 @@ small{color:var(--ink-2,#3d4047)}
 @media (max-width:700px){.fcx{grid-template-columns:1fr}.fcx-ar{transform:rotate(90deg);justify-self:center}}
 .dc-fc{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr)!important}.fcx-tr{height:140px;margin-top:10px}.fcx-pt.alt b{margin-top:52px}.fcx-pt.alt::before{content:"";position:absolute;top:30px;height:44px;border-left:1px dashed #c9cacd}
 @media (max-width:1300px){.dc-fc{grid-template-columns:1fr!important}}
+.st-jr{gap:0!important;margin-top:22px!important}.jt{display:flex;flex-direction:column;min-width:0}.jh{position:relative;padding:20px 34px 22px 40px;clip-path:polygon(0 0,calc(100% - 24px) 0,100% 50%,calc(100% - 24px) 100%,0 100%,24px 50%);margin-right:-14px;height:150px;box-sizing:border-box;white-space:nowrap;display:flex;flex-direction:column;gap:6px}.jt:first-child .jh{clip-path:polygon(0 0,calc(100% - 24px) 0,100% 50%,calc(100% - 24px) 100%,0 100%);padding-left:24px;border-radius:20px 0 0 20px}.jt:last-child .jh{clip-path:polygon(0 0,100% 0,100% 100%,0 100%,24px 50%);margin-right:0;border-radius:0 20px 20px 0}
+.jh-t{display:flex;align-items:center;gap:8px}.jh-t em{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:600 13px var(--f);font-style:normal}.jh-t span{font-size:15px;font-weight:600}.jh-n{display:flex;align-items:baseline;gap:10px}.jh-n b{font-size:46px;font-weight:600;letter-spacing:-.04em;line-height:1}.jh-n i{font-style:normal;font-size:16px;font-weight:600;opacity:.8}.jh-l{font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+.jb{background:var(--surface,#fff);border-radius:18px;margin:10px 8px 0 0;padding:18px;flex:1;display:flex;flex-direction:column;gap:10px}.jt:last-child .jb{margin-right:0}.jb .kl{font-size:15px}.jb .kb{margin-top:auto}.jb .kf{font-size:14px;color:var(--fg-2)}.jb .spark{width:100%;height:40px}.jb .spark polyline{stroke:#ff5456}.jb-mb{align-self:flex-start}
+@media (max-width:1300px){.st-jr{gap:12px!important}.jh{clip-path:none!important;border-radius:18px!important;margin-right:0;padding-left:22px}}
 </style>
 <div class="wrap">
 <header class="top">
@@ -1411,7 +1415,6 @@ small{color:var(--ink-2,#3d4047)}
 
 <section id="status">
   <h2>Status bazy</h2>
-  <div class="st-rail" aria-hidden="true"><div><i>1</i><span>Zamówienie</span></div><div><i>2</i><span>Je</span></div><div><i>3</i><span>Koniec diety</span></div><div><i>4</i><span>Bez dostawy</span></div><div><i>5</i><span>Odpływ</span></div></div>
   <div class="st-kpi st-jr" id="tiles"></div><div id="st-fc" style="margin-top:14px"></div>
   <div class="card nofilter" style="margin-top:14px"><div class="dm-hd"><h3>Ilość dni dostaw</h3><div class="dm-sw" id="dm-sw"></div></div><div id="dm-map"></div></div>
   <div class="st-row" hidden style="display:none">
@@ -1744,7 +1747,8 @@ function renderStatus(){
   return `<div class="st-col"><div class="st-ch" style="--zc:var(${ZONES[z].c})"><span>${ZONES[z].n}</span><b>${pf(zv,tot)}</b></div>${sts.map(s=>`<div class="st-li"><i style="background:var(${s.c})"></i><span>${s.n.replace('Bez dostawy ','').replace('Kończy się ','').replace('Dostawa trwa','trwa 8+ dni')}</span><b>${f(sum(s.k))}</b></div>`).join('')}</div>`;}).join('');
  const seg=(parts)=>`<div class="tbar">${parts.map(([l,v,c])=>`<span style="flex:${v};background:var(${c})"></span>`).join('')}</div><div class="tleg" style="grid-template-columns:repeat(${parts.length},minmax(0,1fr))">${parts.map(([l,v,c])=>`<span><em><i style="background:var(${c})"></i>${l}</em><b>${f(v)}</b></span>`).join('')}</div>`;
  const spark=(()=>{const T=ACTIVE_T.slice(-60),mn=Math.min(...T),mx=Math.max(...T),W=200,H=40,X=i=>i*W/(T.length-1),Y=v=>H-4-(v-mn)/(mx-mn)*(H-8);return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${T.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" opacity=".9"/></svg>`;})();
- const k=(cls,lab,big,col,line,body,foot,pc)=>`<div class="kp ${cls}">${cls==='grad'?VAN:''}<span class="eyebrow">${lab}</span><div class="zk-n"><span class="big" style="${col?'color:'+col:''}">${big}</span>${pc?`<em class="zk-p">${pc}</em>`:''}</div><div class="kl">${line}</div><div class="kb">${body}</div><span class="kf">${foot}</span></div>`;
+ let si=0;const STG=[['Zamówili','#ffe1e1','#090a0c'],['Jedzą','#ff5456','#fff'],['Kończą dietę','#ff9061','#fff'],['Bez dostawy','#ffd2bd','#090a0c'],['Odpłynęli','#5f636a','#fff']];
+ const k=(cls,lab,big,col,line,body,foot,pc)=>{const [sn,bg,fg]=STG[si],i=++si;return `<div class="jt"><div class="jh" style="background:${bg};color:${fg}"><div class="jh-t"><em style="color:${bg};background:${fg}">${i}</em><span>${sn}</span></div><div class="jh-n"><b>${big}</b>${pc?`<i>${pc}</i>`:''}</div><div class="jh-l">${lab.replace('Dostawa kończy się w 7 dni','koniec w ciągu 7 dni').replace(/<span class="mb[\s\S]*$/,'')}</div></div><div class="jb">${lab.match(/<span class="mb[\s\S]*$/)?`<div class="jb-mb">${lab.match(/<span class="mb[\s\S]*$/)[0]}</div>`:''}<div class="kl">${line}</div><div class="kb">${body}</div><span class="kf">${foot}</span></div></div>`;};
  $('#tiles').innerHTML=
   (()=>{const wt=Object.values(WT||{}).reduce((x,v)=>x+(v||0),0);return k('','Czekają na start',f(wt),'var(--magenta)',`<span>zamówili, dostawa jeszcze nie ruszyła</span>${spk(SHser('all',0),cssv('--magenta'))}`,'',`łącznie we wszystkich segmentach`,pf(wt,tot));})()+
   k('grad','Aktywni',f(nowv),'',`${(()=>{const w=win(sr('2026-07-06',ACTIVE_T),SCOPE,'avg');return w.p?dl(w.p,w.c).replace('m/m',PLAB()):''})()}`,spark,SCOPE?'średnio dziennie vs poprzednie '+SCOPE+' dni':'cała historia',pf(nowv,tot))+
