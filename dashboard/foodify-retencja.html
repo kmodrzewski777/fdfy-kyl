@@ -11,7 +11,7 @@
   --magenta:#ff5456; --orange:#ff8a8b; --grad:linear-gradient(120deg,#ff5456 0%,#ff5456 100%); --on-accent:#ffffff;
   --a0:#ff5456; --a1:#ff8a8b; --a2:#ffc1c2; --r0:#ff6b6d; --r1:#ff9a9b; --r2:#ffc6c7; --l0:#5f636a; --l1:#9a9da3; --l2:#dcdcdc; --kc:#5f636a;
   --c-new:#bcbbbb; --c-pot:#ff8a8b; --c-loy:#ff5456; --c-cha:#090a0c;
-  --c-r1:#7c3aed; --c-r2:#16a34a; --c-r3:#f97316; --c-r4:#2563eb; --c-r5:#9ca3af; --c-r1b:#c4b5fd; --c-r2b:#86efac; --c-r3b:#fdba74; --c-r4b:#93c5fd; --c-r5b:#d1d5db;
+  --c-r1:#9d8fc4; --c-r2:#86ad8f; --c-r3:#d4a27c; --c-r4:#8ea3c4; --c-r5:#b4b7bd; --c-r1b:#c4b5fd; --c-r2b:#86efac; --c-r3b:#fdba74; --c-r4b:#93c5fd; --c-r5b:#d1d5db;
   --good:#1f8a4c; --warn:#d9822b; --crit:#ff5456;
   --f:"Plus Jakarta Sans",Arial,sans-serif;
   --rad:16px; --rad-s:8px;
@@ -21,14 +21,14 @@
   --magenta:#ff5456; --orange:#e0696b; --grad:linear-gradient(120deg,#ff5456 0%,#ff5456 100%); --on-accent:#ffffff;
   --a0:#ff5456; --a1:#d9474a; --a2:#8f3436; --r0:#e0595b; --r1:#a8474a; --r2:#6e3133; --l0:#9a9da3; --l1:#5f636a; --l2:#353a44; --kc:#9a9da3;
   --c-new:#797d82; --c-pot:#e0696b; --c-loy:#ff5456; --c-cha:#ffffff;
-  --c-r1:#a78bfa; --c-r2:#4ade80; --c-r3:#fb923c; --c-r4:#60a5fa; --c-r5:#6b7280; --c-r1b:#5b21b6; --c-r2b:#166534; --c-r3b:#9a3412; --c-r4b:#1e40af; --c-r5b:#374151;
+  --c-r1:#9d8fc4; --c-r2:#86ad8f; --c-r3:#d4a27c; --c-r4:#8ea3c4; --c-r5:#8a8d93; --c-r1b:#5b21b6; --c-r2b:#166534; --c-r3b:#9a3412; --c-r4b:#1e40af; --c-r5b:#374151;
   --good:#5fce9b; --warn:#f0a05a; --crit:#ff5456; color-scheme:dark } }
 :root[data-theme="dark"]{
   --bg:#090a0c; --surface:#151618; --surface-2:#1f2125; --ink:#ffffff; --fg:#ffffff; --fg-2:#d0d1d4; --muted:#9a9da3; --line:#26282c;
   --magenta:#ff5456; --orange:#e0696b; --grad:linear-gradient(120deg,#ff5456 0%,#ff5456 100%); --on-accent:#ffffff;
   --a0:#ff5456; --a1:#d9474a; --a2:#8f3436; --r0:#e0595b; --r1:#a8474a; --r2:#6e3133; --l0:#9a9da3; --l1:#5f636a; --l2:#353a44; --kc:#9a9da3;
   --c-new:#797d82; --c-pot:#e0696b; --c-loy:#ff5456; --c-cha:#ffffff;
-  --c-r1:#a78bfa; --c-r2:#4ade80; --c-r3:#fb923c; --c-r4:#60a5fa; --c-r5:#6b7280; --c-r1b:#5b21b6; --c-r2b:#166534; --c-r3b:#9a3412; --c-r4b:#1e40af; --c-r5b:#374151;
+  --c-r1:#9d8fc4; --c-r2:#86ad8f; --c-r3:#d4a27c; --c-r4:#8ea3c4; --c-r5:#8a8d93; --c-r1b:#5b21b6; --c-r2b:#166534; --c-r3b:#9a3412; --c-r4b:#1e40af; --c-r5b:#374151;
   --good:#5fce9b; --warn:#f0a05a; --crit:#ff5456; color-scheme:dark }
 *{box-sizing:border-box}
 b,strong,h1,h2,h3,th{font-weight:600}
@@ -523,6 +523,7 @@ header.top{align-items:center;padding-block:24px 8px}
 .sv-plan,.sv-act{margin-top:16px;padding:28px 32px!important}.sv-ph{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.sv-lg{display:flex;align-items:center;gap:8px;font-size:var(--fs-cap,13px);color:var(--muted)}.sv-lg i{width:18px;height:8px;border-radius:4px;display:inline-block;margin-left:10px}.sv-lg i.a{background:#ff9061}.sv-lg i.b{background:repeating-linear-gradient(45deg,#3d4148 0 3px,#9a9da3 3px 6px)}
 .kbx{display:flex!important;flex-direction:row!important;align-items:center!important;gap:10px!important;flex-wrap:nowrap!important;min-width:0;background:none!important;padding:0!important;border:0!important}.kbx>.dlt{flex:none;margin:0!important;align-self:center!important;position:static!important;transform:none!important}.kbx>b{margin:0!important;line-height:1!important}
 .qa-b{display:none!important}.sb-foot{position:fixed;left:18px;bottom:18px;z-index:60;display:flex;flex-direction:column;align-items:flex-start;gap:6px}.sb-foot .mv-btn{position:static!important}.sb-asof{font:600 12.5px var(--f)!important;color:var(--muted);white-space:nowrap;padding-left:6px;background:none!important}
+.p8hh{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:36px;align-items:center}.p8reach{display:flex;flex-direction:column;gap:14px}.p8rr{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 64px;gap:14px;align-items:center}.p8rl b{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px}.p8rl b i{width:10px;height:10px;border-radius:3px}.p8rl span{font-size:13px;color:var(--muted)}.p8rl strong{color:var(--fg);font-weight:600}.p8rb{height:12px;border-radius:6px;background:var(--surface-2);overflow:hidden}.p8rb i{display:block;height:100%;background:var(--magenta);border-radius:6px}.p8rr>em{font-style:normal;font-weight:600;font-size:20px;text-align:right}.donut-row:has(.p8seg){display:block!important}.p8hn{flex-wrap:nowrap;align-items:center!important}.p8hn>span:not(.dlt){white-space:nowrap}.p8hn>.dlt{margin-left:12px}.p8seg{display:flex;flex-direction:column;gap:14px;width:100%}@media(max-width:900px){.p8hh{grid-template-columns:1fr}}
 .lv-mix{display:flex;height:22px;border-radius:8px;overflow:hidden;gap:2px;margin-top:6px}.lv-mix i{display:block}.lv-mixl{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:14px;font-size:14px;color:var(--fg-2)}.lv-mixl span{display:flex;align-items:center;gap:7px}.lv-mixl i{width:10px;height:10px;border-radius:3px}.lv-mixl b{font-weight:600;color:var(--fg)}
 .lv-track{display:flex;align-items:stretch;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 12px}.lv-ar{align-self:center;font:600 24px var(--f);color:#b8b9bc;flex:none}.lv{flex:0 0 330px;scroll-snap-align:start;background:var(--surface-2);border-radius:20px;padding:20px 20px 16px;display:flex;flex-direction:column;gap:12px;border:2px solid transparent}.lv.nx{border-color:var(--ink)}.lv.out{background:transparent;border:2px dashed var(--line)}.lv-hd{display:flex;justify-content:space-between;align-items:center;font-size:13px}.lv-no{font-weight:600;text-transform:uppercase;letter-spacing:.06em}.lv-tm{color:var(--muted)}.lv-sc{display:flex;align-items:baseline;gap:10px}.lv-sc b{font-size:44px;font-weight:600;letter-spacing:-.03em;line-height:1}.lv-sc span{color:var(--muted);font-size:15px}.lv-q{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);padding-top:12px}.lv-r{display:flex;flex-direction:column;gap:5px}.lv-r.lv-kp{opacity:.6}.sv-r>.sv-cmp:first-child{border-top:0;padding-top:0;margin:auto 0}.lv-rt{display:flex;justify-content:space-between;gap:8px;font-size:14.5px;font-weight:600}.lv-rt b{font-weight:600;font-variant-numeric:tabular-nums}.lv-rt em{display:inline-block;font-style:normal;font-size:11px;font-weight:600;background:var(--ink);color:#fff;border-radius:6px;padding:1px 6px;margin-right:6px;vertical-align:1px}.lv-r small{font-size:13px;color:var(--muted)}.lv-r small b{color:var(--fg);font-weight:600}
 .sv-rows{display:grid;grid-template-columns:1fr 1fr;gap:4px 40px}.sv-row{display:grid;grid-template-columns:minmax(160px,210px) 1fr 44px 74px;grid-template-rows:auto auto;column-gap:14px;row-gap:2px;align-items:center;border:0;background:none;font:inherit;color:inherit;text-align:left;padding:12px 14px;border-radius:14px;cursor:pointer;height:84px}.sv-row:hover{background:var(--surface-2)}.sv-row.sel{background:var(--surface-2);box-shadow:inset 3px 0 0 var(--ink)}.sv-row.off{opacity:.55}.sv-row .sc-l{grid-row:1/span 2}.sv-sub{grid-column:2/-1;font-size:var(--fs-cap,13px);color:var(--muted)}.sv-ov{color:var(--crit);font-weight:600}
@@ -1493,7 +1494,7 @@ small,.kt-sm,.kt-note,.tsub,.kf,.kl,.kl span,.legend span,.kw-lg span,.p8leg2 sp
     <button class="sb-opt dev" data-v="web" aria-pressed="false"><span class="dv-i"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="1.5"/><path d="M8 21h8M12 17v4"/></svg>Web</span></button>
     <button class="sb-opt dev" data-v="app" aria-pressed="false"><span class="dv-i"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>App</span></button></div>
   <nav class="sb-nav" aria-label="Sekcje"><a class="sb-part k" href="#score">Scoring retencji</a>
-    <a class="sb-part z" href="#zgodypart">Zgody</a><a href="#zgody">Zgody marketingowe</a> <a class="sb-part k" href="#p8part">Programy</a><a href="#p800">Jedzeniowe 800+</a> <a class="sb-part k" href="#klienci">Klienci</a><a href="#status">Status bazy</a><a href="#wartosc">Przychód</a><a href="#trendy">Trendy</a><a href="#segmenty">Segmenty</a><div class="sb-sub"><a href="#karta-R1" class="sb-seg" style="--sc:var(--c-r1)"><i></i>Czempioni</a><a href="#karta-R2" class="sb-seg" style="--sc:var(--c-r2)"><i></i>Lojalni</a><a href="#karta-R3" class="sb-seg" style="--sc:var(--c-r3)"><i></i>Obiecujący</a><a href="#karta-R4" class="sb-seg" style="--sc:var(--c-r4)"><i></i>Okazjonalni</a><a href="#karta-R5" class="sb-seg" style="--sc:var(--c-r5)"><i></i>Niska wartość</a></div><a href="#lejki">Lejki retencji</a><a href="#nowi">Nowi klienci</a><a href="#drugie">Drugie zamówienie</a><a href="#mom">Porównanie okresów</a><a href="#rabaty">Rabaty</a><a href="#cashback">Cashback</a><a href="#gryzy">Gryzy</a> <a class="sb-part c" href="#churnpart">Churn</a><a href="#churn">Podsumowanie i mapa churnu</a><a href="#nieaktywni">Nieaktywni</a> <a class="sb-part l" href="#leadypart">Leady</a><a href="#leady">Zaangażowanie</a><a href="#leadflow">Napływ i sunset</a><a href="#leadbeh">Co robią leady</a><a href="#leadcmp">Porównanie okresów</a> <a class="sb-part a" href="#apppart">Aplikacja</a><a href="#app">Aplikacja i push</a> <a class="sb-part f" href="#flowpart">Kampanie</a><a href="#flows">Performance kampanii</a><a href="#inkr">Inkrementalność</a>
+    <a class="sb-part z" href="#zgodypart">Zgody</a><a href="#zgody">Zgody marketingowe</a> <a class="sb-part k" href="#p8part">Programy</a><a href="#p800">Jedzeniowe 800+</a> <a class="sb-part k" href="#klienci">Klienci</a><a href="#status">Status bazy</a><a href="#wartosc">Przychód</a><a href="#trendy">Trendy</a><a href="#segmenty">Segmenty</a><div class="sb-sub"><a href="#karta-R1" class="sb-seg" style="--sc:var(--c-r1)"><i></i>Czempioni</a><a href="#karta-R2" class="sb-seg" style="--sc:var(--c-r2)"><i></i>Lojalni</a><a href="#karta-R3" class="sb-seg" style="--sc:var(--c-r3)"><i></i>Obiecujący</a><a href="#karta-R4" class="sb-seg" style="--sc:var(--c-r4)"><i></i>Okazjonalni</a><a href="#karta-R5" class="sb-seg" style="--sc:var(--c-r5)"><i></i>Niska wartość</a></div><a href="#lejki">Lejki retencji</a><a href="#nowi">Nowi klienci</a><a href="#drugie">Drugie zamówienie</a><a href="#rabaty">Rabaty</a><a href="#cashback">Cashback</a><a href="#gryzy">Gryzy</a> <a class="sb-part c" href="#churnpart">Churn</a><a href="#churn">Podsumowanie i mapa churnu</a><a href="#nieaktywni">Nieaktywni</a> <a class="sb-part l" href="#leadypart">Leady</a><a href="#leady">Zaangażowanie</a><a href="#leadflow">Napływ i sunset</a><a href="#leadbeh">Co robią leady</a> <a class="sb-part a" href="#apppart">Aplikacja</a><a href="#app">Aplikacja i push</a> <a class="sb-part f" href="#flowpart">Kampanie</a><a href="#flows">Performance kampanii</a><a href="#inkr">Inkrementalność</a>
     <a class="sb-part d" href="#dzialania" hidden>Działania</a><a href="#automatyzacje" hidden>Automatyzacje</a></nav>
   <span class="fstat" id="fstat" hidden></span>
 </aside>
@@ -1569,7 +1570,6 @@ small,.kt-sm,.kt-note,.tsub,.kf,.kl,.kl span,.legend span,.kw-lg span,.p8leg2 sp
     <div class="card nofilter"><h3>Drabina zamówień</h3><div class="hf" id="f-ladder"></div></div>
     <div class="card nofilter"><h3>Od klienta do jedzącego dziś</h3><div class="hf" id="f-life"></div></div>
   </div>
-  <div class="card nofilter" style="margin-top:18px"><h3>Bariera retencji: nieaktywni wg liczby zamówień</h3><div id="barrier"></div></div>
 </section>
 
 <section id="nowi">
@@ -1595,10 +1595,7 @@ small,.kt-sm,.kt-note,.tsub,.kf,.kl,.kl span,.legend span,.kw-lg span,.p8leg2 sp
   <div class="card nofilter wk-mt"><h3>Weekendy w ostatnich tygodniach</h3><p class="wk-sub">Zamówienia dzień po dniu; czerwone pasy to weekendy z ich sumą zamówień i przychodu.</p><div id="wk-days"></div></div>
   <div class="card nofilter wk-mt"><h3>Kto ma dostawę w najbliższe weekendy</h3><div id="wk-next"></div></div>
 </section>
-<section id="mom">
-  <h2>Porównanie okresów</h2>
-  <div class="pc card" id="pc-k"></div>
-</section>
+
 
 
 
@@ -1703,10 +1700,7 @@ small,.kt-sm,.kt-note,.tsub,.kf,.kl,.kl span,.legend span,.kw-lg span,.p8leg2 sp
   <div class="card nofilter" style="margin-top:18px"><h3>Co z tego wynika: gdzie leady odpadają</h3><div id="lb-ins"></div></div>
 </section>
 
-<section id="leadcmp">
-  <h2>Porównanie okresów</h2>
-  <div class="pc card" id="pc-l"></div>
-</section>
+
 
 <div id="apppart" class="pdiv a"><span class="pdn">Aplikacja</span></div>
 <section id="app">
@@ -1854,7 +1848,7 @@ function devG(d){if(!RAW[d])return RAW[d];const key=d+DEV;if(DCACHE[key])return 
 prep();
 let DIM='rfm',CHN='all',SEL={g:null,s:'e03',z:null};
 
-const SICON=k=>k==='R1'?'<svg class="sic" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gcr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4b5fd"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><path d="M3 8l4.5 3.5L12 4l4.5 7.5L21 8l-2 11H5L3 8z" fill="url(#gcr)"/><rect x="5" y="19.5" width="14" height="2" rx="1" fill="#7c3aed"/></svg>':k==='R2'?'<svg class="sic" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gmd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#86efac"/><stop offset="1" stop-color="#16a34a"/></linearGradient></defs><path d="M7 2h4l1 5-3 1zM17 2h-4l-1 5 3 1z" fill="#16a34a" opacity=".55"/><circle cx="12" cy="15" r="6.5" fill="url(#gmd)"/><path d="M12 11.6l1 2.1 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3z" fill="#fff"/></svg>':'<i></i>';
+const SICON=k=>k==='R1'?'<svg class="sic" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gcr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4b5fd"/><stop offset="1" stop-color="#9d8fc4"/></linearGradient></defs><path d="M3 8l4.5 3.5L12 4l4.5 7.5L21 8l-2 11H5L3 8z" fill="var(--c-r1)"/><rect x="5" y="19.5" width="14" height="2" rx="1" fill="#9d8fc4"/></svg>':k==='R2'?'<svg class="sic" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gmd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#86efac"/><stop offset="1" stop-color="#16a34a"/></linearGradient></defs><path d="M7 2h4l1 5-3 1zM17 2h-4l-1 5 3 1z" fill="#16a34a" opacity=".55"/><circle cx="12" cy="15" r="6.5" fill="var(--c-r2)"/><path d="M12 11.6l1 2.1 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3z" fill="#fff"/></svg>':'<i></i>';
 const G=()=>devG(DIM),share=g=>CHN==='all'?1:g.ch[CHN]/g.tot,val=(g,s)=>g.st[s]*share(g);
 const now=g=>g.st.act+g.st.e47+g.st.e03,risk=g=>g.st.d07+g.st.d814+g.st.d1530,lap=g=>g.st.d3160+g.st.d6190+g.st.d90;
 
@@ -1863,7 +1857,7 @@ let DGID=0;function donut(el,items,center,legEl,opt={}){
  let s=`<svg viewBox="0 0 220 220" role="img" aria-label="${center.small||''}">`;
  items.forEach((it,k)=>{if(!it.v)return;const ang=2*Math.PI*it.v/tot,a1=a0+ang,st=a0+gap,en=Math.max(st+0.001,a1-gap),big=(en-st)>Math.PI?1:0;
   const p=(ang>=2*Math.PI-1e-4)?`M${cx},${cy-R}A${R},${R} 0 1 1 ${cx-0.01},${cy-R}L${cx-0.01},${cy-r}A${r},${r} 0 1 0 ${cx},${cy-r}Z`:`M${cx+R*Math.cos(st)},${cy+R*Math.sin(st)}A${R},${R} 0 ${big} 1 ${cx+R*Math.cos(en)},${cy+R*Math.sin(en)}L${cx+r*Math.cos(en)},${cy+r*Math.sin(en)}A${r},${r} 0 ${big} 0 ${cx+r*Math.cos(st)},${cy+r*Math.sin(st)}Z`;
-  const gid='dg'+(++DGID);s+=`<defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${it.c}" stop-opacity=".72"/><stop offset="1" stop-color="${it.c}"/></linearGradient></defs><path d="${p}" fill="url(#${gid})" data-k="${k}" class="sl" style="transition:opacity .15s,transform .15s;transform-origin:110px 110px"/>`;a0=a1;});
+  s+=`<path d="${p}" fill="${it.c}" data-k="${k}" class="sl" style="transition:opacity .15s,transform .15s;transform-origin:110px 110px"/>`;a0=a1;});
   s+=`<text x="${cx}" y="${cy+8}" text-anchor="middle" class="c1" style="font-size:${String(center.big).length>7?26:String(center.big).length>5?32:38}px">${center.big}</text><text x="${cx}" y="${cy+30}" text-anchor="middle" class="c2">${center.small||''}</text></svg>`;
  el.innerHTML=s;
  if(legEl) legEl.innerHTML=items.map((it,k)=>`${it.grp?`<div class="grp">${it.grp}</div>`:''}<div class="li" data-k="${k}"><i style="background:${it.c}"></i><span>${it.l}</span><b>${it.t??pf(it.v,tot)}<small>${it.s??f(it.v)}</small></b></div>`).join('');
@@ -1886,7 +1880,7 @@ function renderStatus(){
  const seg=(parts)=>`<div class="tbar">${parts.map(([l,v,c])=>`<span style="flex:${v};background:var(${c})"></span>`).join('')}</div><div class="tleg" style="grid-template-columns:repeat(${parts.length},minmax(0,1fr))">${parts.map(([l,v,c])=>`<span><em><i style="background:var(${c})"></i>${l}</em><b>${f(v)}</b></span>`).join('')}</div>`;
  const spark=(()=>{const T=ACTIVE_T.slice(-60),mn=Math.min(...T),mx=Math.max(...T),W=200,H=40,X=i=>i*W/(T.length-1),Y=v=>H-4-(v-mn)/(mx-mn)*(H-8);return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${T.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" opacity=".9"/></svg>`;})();
  let si=0;
- const k=(cls,lab,big,col,line,body,foot,pc)=>`<div class="kp ${cls}">${cls==='grad'?VAN:''}<span class="eyebrow"><span><em class="stn">${++si}</em>${lab.replace(/<span class="mbadge[\s\S]*$/,'')}</span>${(lab.match(/<span class="mbadge[\s\S]*$/)||[''])[0]}</span><div class="zk-n"><span class="big" style="${col?'color:'+col:''}">${big}</span>${pc?`<em class="zk-p">${pc}</em>`:''}</div><div class="kl">${line}</div><div class="kb">${body}</div><span class="kf">${foot}</span></div>`;
+ const k=(cls,lab,big,col,line,body,foot,pc)=>`<div class="kp ${cls}">${cls==='grad'?VAN:''}<span class="eyebrow"><span>${lab.replace(/<span class="mbadge[\s\S]*$/,'')}</span>${(lab.match(/<span class="mbadge[\s\S]*$/)||[''])[0]}</span><div class="zk-n"><span class="big" style="${col?'color:'+col:''}">${big}</span>${pc?`<em class="zk-p">${pc}</em>`:''}</div><div class="kl">${line}</div><div class="kb">${body}</div><span class="kf">${foot}</span></div>`;
  $('#tiles').innerHTML=
   (()=>{const wt=Object.values(WT||{}).reduce((x,v)=>x+(v||0),0);return k('','Czekają na start',f(wt),'var(--magenta)',`<span>zamówili, dostawa jeszcze nie ruszyła</span>${spk(SHser('all',0),cssv('--magenta'))}`,'',`łącznie we wszystkich segmentach`,pf(wt,tot));})()+
   k('grad','Aktywni',f(nowv),'',`${(()=>{const w=win(sr('2026-07-06',ACTIVE_T),SCOPE,'avg');return w.p?dl(w.p,w.c).replace('m/m',PLAB()):''})()}`,spark,SCOPE?'średnio dziennie vs poprzednie '+SCOPE+' dni':'cała historia',pf(nowv,tot))+
@@ -2054,7 +2048,7 @@ function renderLeads(){
  const LS={all:1,email:(LEAD.tot-LEAD.sunsetted)/LEAD.tot,sms:LEAD.sms/LEAD.tot,push:LEAD.push/LEAD.tot,app:LEAD.app/LEAD.tot}[CHN],L0=LEAD,L={...LEAD};['tot','open30','click30','atrisk','sunCand','sunsetted','remove','cart','checkout','engaged'].forEach(k=>L[k]=LEAD[k]*LS);
  const lin=avg(L0.e)*LS,lout=avg(L0.l.filter(v=>v<1000))*LS,opened=L.open30-L.click30,rest=Math.max(0,L.tot-L.open30-L.atrisk);
  $('#lead-tiles').innerHTML=`
-  <div class="tile grad"><span class="eyebrow">Leadzi ze zgodą</span><span class="big">${f(L.tot)}</span><span class="tsub">${CHN==='all'?'bez żadnego zakupu':'z kanałem '+CH[CHN]+' (szacunek)'}</span></div>
+  <div class="tile grad"><span class="eyebrow">Leadzi ze zgodą</span><span class="big">${f(L.tot)}</span><span class="tsub">${CHN==='all'?'bez żadnego zakupu':CHN==='email'?'osiągalnych e-mailem (zgoda minus wygaszeni)':'osiągalnych kanałem '+CH[CHN]}</span></div>
   <div class="tile"><span class="eyebrow">Otwierają (30 dni)</span><div class="zk-n"><span class="big">${f(L.open30)}</span><em class="zk-p">${pf(L.open30,L.tot)}</em></div><span class="tsub">otworzyło e-mail</span></div>
   <div class="tile"><span class="eyebrow">Klikają (30 dni)</span><div class="zk-n"><span class="big" style="color:var(--magenta)">${f(L.click30)}</span><em class="zk-p">${pf(L.click30,L.tot)}</em></div><span class="tsub">kliknęło w e-mail</span></div>
   <div class="tile"><span class="eyebrow">Przybywa / odchodzi</span><span class="big">+${f(lin)} <span style="color:var(--muted);font-size:24px">/ −${f(lout)}</span></span><span class="tsub">dziennie, ostatnie 30 dni, bez akcji sunset</span></div>
@@ -2396,34 +2390,35 @@ function renderP8(){
  const noUse=P.members-P.buy,noUseNoEat=noUse-P.eatNoBuy;
  const t0=D0('2026-09-28'),se=sr('2026-09-28',P.day.e),sb=sr('2026-09-28',P.day.b),N=SCOPE||P.day.e.length;
  const we=win(se,N,'sum'),wb=win(sb,N,'sum'),E=END-CUT*864e5,from=Math.max(t0,E-(N-1)*864e5);
- const cmp=(w,g)=>w.p?dl(w.p,w.c,g).replace('m/m','vs poprz. okres'):'';
+ const cmp=(w,g)=>PB(w.c,w.p||null);
  const spark=(d,c)=>{const mx=Math.max(...d,1),W=120,H=34,X=i=>d.length>1?i*W/(d.length-1):W/2,Y=v=>H-3-v/mx*(H-6);return `<svg class="p8sp" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polyline points="${d.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`;};
  const M=(n,pct,lab,col)=>`<div class="p8m"><div class="p8n"><b>${n}</b>${pct?`<em style="background:${col||'var(--surface-2)'};color:${col?'#fff':'var(--fg)'}">${pct}</em>`:''}</div><span>${lab}</span></div>`;
  const seg=[['Zapłacili środkami',P.buy,'var(--magenta)','#fff'],['Jedzą, środków jeszcze nie użyli',P.eatNoBuy,'var(--orange)','#161616'],['Bez dostawy, bez użycia środków',noUseNoEat,'#8a8a8a','#fff']];
  const pp=(x,y)=>y?x/y*100:0,st=[['Zapisali się',P.members,'do programu od 28.09'],['Kupili ze środków',P.buy,'pierwsza płatność środkami'],['Kupili ponownie',P.buy2,'drugi zakup ze środków'],['Regularnie',P.buy3,'3+ zakupy ze środków']];
- const jr=`<div class="p8jr">${st.map((x,i)=>`${i?`<div class="p8ja"><b>${pf(x[1],st[i-1][1])}</b><span>przechodzi dalej</span><svg viewBox="0 0 60 16"><path d="M0 8H52M46 2l8 6-8 6" fill="none" stroke="currentColor" stroke-width="2.5"/></svg></div>`:''}<div class="p8js ${i===0?'on':''}"><i>${i+1}</i><span>${x[0]}</span><b>${f(x[1])}</b><small>${x[2]}</small><div class="p8jb"><em style="width:${Math.max(2,pp(x[1],P.members))}%"></em></div></div>`).join('')}</div>`;
- const ins=[['Konwersja',pf(P.buy,P.members),'var(--magenta)','członków już zapłaciło środkami',`${f(P.buy)} z ${f(P.members)} osób użyło środków z 800+ przynajmniej raz. ${f(P.buy2)} z nich zrobiło to ponownie.`],
+ const jr=`<div class="p8jr">${st.map((x,i)=>`${i?`<div class="p8ja"><b>${pf(x[1],st[i-1][1])}</b><span>przechodzi dalej</span><svg viewBox="0 0 60 16"><path d="M0 8H52M46 2l8 6-8 6" fill="none" stroke="currentColor" stroke-width="2.5"/></svg></div>`:''}<div class="p8js ${i===0?'on':''}"><i>${i+1}</i><span>${x[0]}</span><div class="kbx"><b>${f(x[1])}</b>${i===0?PB(x[1],x[1]-we.c>0?x[1]-we.c:null):i===1?PB(x[1],x[1]-wb.c>0?x[1]-wb.c:null):PB(0,null)}</div><small>${x[2]}</small><div class="p8jb"><em style="width:${Math.max(2,pp(x[1],P.members))}%"></em></div></div>`).join('')}</div>`;
+ const CL=STATIC.ladder[0].v,inC=P.members-P.who.lead,LT=LEAD.tot,inL=P.who.lead,rb=(l,a,b)=>`<div class="p8rr"><div class="p8rl"><b>${l}</b><span>${f(a)} z ${f(b)} w programie · <strong>${f(Math.max(0,b-a))}</strong> poza nim</span></div><div class="p8rb"><i style="width:${pp(a,b)}%"></i></div><em>${pf(a,b)}</em></div>`;
+ const reach=`<div class="p8reach"><span class="eyebrow">Zasięg programu w bazie</span>${rb('Klienci',inC,CL)}${rb('Leady ze zgodą',inL,LT)}</div>`;
+ const ins0=[['Konwersja',pf(P.buy,P.members),'var(--magenta)','członków już zapłaciło środkami',`${f(P.buy)} z ${f(P.members)} osób użyło środków z 800+ przynajmniej raz. ${f(P.buy2)} z nich zrobiło to ponownie.`],
   ['Nowi klienci',f(P.whoBuy.lead)+' / '+f(P.who.lead),'var(--crit)','nowych osób kupiło ze środków',`${pf(P.who.lead,P.members)} członków to osoby bez wcześniejszych zamówień, ale prawie żadna jeszcze nie kupiła. Program na razie nagradza stałych klientów.`],
   ['Szansa teraz',f(P.eatNoBuy),'var(--orange)','jedzą, ale nie użyli środków',`Te osoby mają aktywną dietę i środki do wykorzystania — przypomnienie przy następnym zamówieniu to najprostsza konwersja.`],
   ['Do aktywacji',f(noUseNoEat),'var(--ink)','bez dostawy i bez użycia środków',`${pf(noUseNoEat,P.members)} członków nie je i nie kupiło. To główna grupa do kampanii aktywującej (nudge do pierwszego zamówienia).`]];
- $('#p8-tiles').innerHTML=`<div class="card p8h2"><div class="p8hh"><div><span class="eyebrow">Członkowie programu · start 28 września</span><div class="p8hn"><b>${f(P.members)}</b><span>osób w programie</span></div><p class="p8hp"><strong>${pf(P.buy,P.members)}</strong> już kupiło ze środków, ${f(P.susp)} kont zawieszonych. Poniżej droga członka od zapisu do regularnych zakupów.</p></div></div>${jr}</div>
- <div class="kt-ins4 p8ins">${ins.map(([c,n,col,h,t,bd])=>`<div class="card kt-i4"><span class="cz-eb">${c}</span><b class="kt-i4n" style="color:${col}">${n}</b>${bd||''}<h3>${h}</h3><p>${t}</p></div>`).join('')}</div>
+ $('#p8-tiles').innerHTML=`<div class="card p8h2"><div class="p8hh"><div><span class="eyebrow">Członkowie programu · start 28 września</span><div class="p8hn"><b>${f(P.members)}</b><span>osób w programie</span>${PB(P.members,P.members-we.c>0?P.members-we.c:null)}</div><p class="p8hp">${f(P.susp)} kont zawieszonych.</p></div>${reach}</div>${jr}</div>
  <div class="p8card"><div class="p8ct"><b>Gdzie są członkowie</b></div>
   <div class="p8bar2">${seg.map(x=>`<div style="flex:${x[1]};background:${x[2]};color:${x[3]}"><b>${f(x[1])}</b><span>${pf(x[1],P.members)}</span></div>`).join('')}</div>
   <div class="p8leg2">${seg.map(x=>`<span style="flex:${x[1]}"><i style="background:${x[2]}"></i>${x[0]}</span>`).join('')}</div>
  </div>
  <div class="p8card"><div class="p8ct"><b>W wybranym okresie</b><span>${dfs(from)} – ${dfs(E)}</span></div>
   <div class="p8per">
-   <div><span class="eyebrow">Zapisy</span><div class="p8n"><b>${f(we.c)}</b>${cmp(we,true)}</div>${spark(P.day.e,'var(--magenta)')}</div>
-   <div><span class="eyebrow">Pierwszy zakup ze środków</span><div class="p8n"><b>${f(wb.c)}</b><span class="p8x">osób</span>${cmp(wb,true)}</div>${spark(P.day.b,'var(--orange)')}</div>
+   <div><span class="eyebrow">Zapisy</span><div class="p8n"><b>${f(we.c)}</b>${cmp(we,true)}</div></div>
+   <div><span class="eyebrow">Pierwszy zakup ze środków</span><div class="p8n"><b>${f(wb.c)}</b><span class="p8x">osób</span>${cmp(wb,true)}</div></div>
    <div><span class="eyebrow">Zapisani, którzy już kupili</span><div class="p8n"><b>${we.c?pf(wb.c,we.c):'—'}</b><span class="p8x">${f(wb.c)} z ${f(we.c)}</span></div><div class="p8cv"><i style="width:${we.c?Math.min(100,wb.c/we.c*100):0}%"></i></div></div>
   </div>
  </div>`;
  funnelH($('#f-p8'),[{l:'Zapisani',v:P.members},{l:'1. zakup ze środków',v:P.buy,why:'Zapłacili choć raz środkami z programu.'},{l:'2+ zakupy',v:P.buy2,why:'Wrócili po środki drugi raz.'},{l:'3+ zakupy',v:P.buy3,why:'Regularne korzystanie.'}],{aria:'Lejek 800+'});
  lines($('#ch-p8'),[{n:'Zapisy',d:P.day.e,c:mag,date:i=>P.day.lab[i]},{n:'Pierwszy zakup ze środków',d:P.day.b,c:org,date:i=>P.day.lab[i]}],P.day.lab.map((l,i)=>[l,i]),0,520,'Zapisy i zakupy 800+',$('#leg-p8'));
  {const R=P.rfm||{tot:1235,r:[479,212,93,16,5]},noR=R.tot-R.r.reduce((a,b)=>a+b,0);
- if(P8W==='rfm')donut($('#d-p8who'),[...['Czempioni','Lojalni','Obiecujący','Okazjonalni','Niska wartość'].map((l,i)=>({l,v:R.r[i],c:cssv('--c-r'+(i+1))})),{l:'Bez segmentu RFM',v:noR,c:cssv('--l2')}],{big:pf(R.r[0]+R.r[1],R.tot),small:'czempioni i lojalni'},$('#l-p8who'));
- else donut($('#d-p8who'),[{l:'Nowi (bez zamówień)',v:P.who.lead,c:cssv('--l1')},{l:'1 zamówienie',v:P.who.o1,c:cssv('--c-new')},{l:'2–3 zamówienia',v:P.who.o23,c:cssv('--c-pot')},{l:'4+ zamówień',v:P.who.o4,c:cssv('--c-loy')}],{big:pf(P.who.o4,P.members),small:'to stali klienci'},$('#l-p8who'));}
+ if(P8W==='rfm'){const RG=JSON.parse(RAW0).rfm||[],nm=['Czempioni','Lojalni','Obiecujący','Okazjonalni','Niska wartość'];$('#d-p8who').closest('.donut-row').innerHTML=`<div class="p8seg"><p class="wk-sub">Jaki odsetek każdego segmentu RFM jest w programie.</p>${nm.map((l,i)=>{const T=(RG.find(g=>g.k==='R'+(i+1))||{}).tot||0,a=R.r[i];return `<div class="p8rr"><div class="p8rl"><b><i style="background:var(--c-r${i+1})"></i>${l}</b><span>${f(a)} z ${f(T)} w segmencie</span></div><div class="p8rb"><i style="width:${pp(a,T)}%;background:var(--c-r${i+1})"></i></div><em>${pf(a,T)}</em></div>`;}).join('')}</div><div class="donut" id="d-p8who" hidden></div><div class="dl" id="l-p8who" hidden></div>`;}
+ else{const sg=document.querySelector('#p800 .p8seg');if(sg)sg.parentElement.innerHTML='<div class="donut" id="d-p8who"></div><div class="dl" id="l-p8who"></div>';} if(P8W!=='rfm')donut($('#d-p8who'),[{l:'Nowi (bez zamówień)',v:P.who.lead,c:cssv('--l1')},{l:'1 zamówienie',v:P.who.o1,c:cssv('--c-new')},{l:'2–3 zamówienia',v:P.who.o23,c:cssv('--c-pot')},{l:'4+ zamówień',v:P.who.o4,c:cssv('--c-loy')}],{big:pf(P.who.o4,P.members),small:'to stali klienci'},$('#l-p8who'));}
  const cv=[['Nowi (bez zamówień)',P.who.lead,P.whoBuy.lead],['1 zamówienie',P.who.o1,P.whoBuy.o1],['2–3 zamówienia',P.who.o23,P.whoBuy.o23],['4+ zamówień',P.who.o4,P.whoBuy.o4]];
  $('#p8-conv').innerHTML=`<div class="p8cr">${cv.map(r=>`<div class="p8crr"><div><b>${r[0].replace(/\s*\(.*\)/,'')}</b><span>${f(r[2])} z ${f(r[1])} kupiło</span></div><div class="p8crb"><em style="width:${Math.max(.6,r[2]/r[1]*100)}%"></em></div><strong>${pf(r[2],r[1])}</strong></div>`).join('')}</div>`;
  $('#p8-conv').insertAdjacentHTML('beforeend',`<div class="p8key"><b>${pf(P.whoBuy.o4,P.buy)}</b><span>kupujących ze środków to stali klienci (4+ zamówień)</span></div>`);
@@ -2963,7 +2958,7 @@ function renderDMap(){const el=document.getElementById('dm-map');if(!el)return;c
  const W=1500,H=420,P={l:60,r:16,t:40,b:36},X=i=>P.l+i*(W-P.l-P.r)/N,top=Math.max(...[...Array(N+1).keys()].map(i=>keys.reduce((x,k)=>x+SV[k][i],0)),1),Y=v=>P.t+(H-P.t-P.b)*(1-v/top);
  const sm=pts=>{let d='M'+pts[0][0]+','+pts[0][1];for(let i=0;i<pts.length-1;i++){const p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)];const c1=[p1[0]+(p2[0]-p0[0])/6,p1[1]+(p2[1]-p0[1])/6],c2=[p2[0]-(p3[0]-p1[0])/6,p2[1]-(p3[1]-p1[1])/6];d+=`C${c1[0]},${c1[1]} ${c2[0]},${c2[1]} ${p2[0]},${p2[1]}`;}return d;};
  let base=new Array(N+1).fill(0),areas='';keys.forEach(k=>{const c=cssv((SG.find(x=>x[0]===k)||[0,'--magenta'])[1]);const up=base.map((b,i)=>b+SV[k][i]);
-  areas+=`<defs><linearGradient id="dmg-${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}"/><stop offset="1" stop-color="${c}" stop-opacity=".55"/></linearGradient></defs><path d="${sm(up.map((v,i)=>[X(i),Y(v)]))}L${sm([...base].reverse().map((v,i)=>[X(N-i),Y(v)])).slice(1)}Z" fill="url(#dmg-${k})" stroke="var(--surface)" stroke-width=".6"/>`;base=up;});
+  areas+=`<path d="${sm(up.map((v,i)=>[X(i),Y(v)]))}L${sm([...base].reverse().map((v,i)=>[X(N-i),Y(v)])).slice(1)}Z" fill="${c}" fill-opacity=".8" stroke="var(--surface)" stroke-width=".6"/>`;base=up;});
  let pts='';[0,7,14,21,30,45].forEach(k=>{const v=keys.reduce((x,q)=>x+SV[q][k],0);pts+=`<line x1="${X(k)}" x2="${X(k)}" y1="${Y(v)}" y2="${H-P.b}" stroke="var(--kc)" stroke-opacity=".25" stroke-dasharray="3 4"/><circle cx="${X(k)}" cy="${Y(v)}" r="4" fill="var(--kc)"/><text x="${X(k)+(k?0:6)}" y="${Y(v)-12}" text-anchor="${k?'middle':'start'}" class="dm-pl">${f(Math.round(v))}</text>`;});
  let grid='';for(let i=0;i<=4;i++){const v=top*i/4;grid+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${P.l-6}" y="${Y(v)+4}" text-anchor="end" font-size="18" fill="var(--muted)">${f(Math.round(v))}</text>`;}
  for(let k=0;k<=N;k+=7)grid+=`<text x="${X(k)}" y="${H-6}" text-anchor="middle" font-size="18" fill="var(--muted)">${k?dd(k):'dziś'}</text>`;
