@@ -1410,7 +1410,7 @@ small,.kt-sm,.kt-note,.tsub,.kf,.kl,.kl span,.legend span,.kw-lg span,.p8leg2 sp
 .cz-hero .t{font-size:var(--fs-sub)!important}
 .sc-hb span,.br-d,.stn,.fr-n,.fr-rv,.fr-v,.qh{font-size:var(--fs-cap)!important}
 .p8crr strong{font-size:var(--fs-d4)!important}
-</style>
+.kt-howpop{display:flex!important;flex-direction:column;gap:14px;grid-template-columns:none!important}.kt-howpop>div{min-width:0}</style>
 <div class="wrap">
 <header class="top">
 </header><div class="cmod" id="cust" hidden><div class="cmod-b" role="dialog" aria-label="Własny zakres"><h3>Własny zakres</h3><div class="cmod-r"><label>Od<input type="date" id="c-from"></label><label>Do<input type="date" id="c-to"></label></div><div class="cmod-a"><button type="button" class="chip" id="c-x">Anuluj</button><button type="button" class="chip cmod-ok" id="c-ok">Zatwierdź</button></div></div></div>
@@ -2970,7 +2970,8 @@ function renderKarta(k,keep){const box=document.getElementById('karta');if(!box)
  const fc2=BIG('Za 6 miesięcy będzie jeść',Math.round(s6*100)+'%','#ff5456','dzisiejszych jedzących',`Z ${N(me.act)} dzisiejszych jedzących za pół roku będzie jeść ok. ${N(actF(cMid,6))} (zakres ${N(actF(cHi,6))}–${N(actF(cLo,6))}). ${cmpName}: ${Math.round(surv(cMidC,6)*100)}%.`,
   [['Szansa za 3 mies.',Math.round(s3*100)+'%',dl0(s3,surv(cMidC,3),0,v=>Math.round(v*100)+' pp vs '+cmpName)],['Po roku',Math.round(s12*100)+'%',sm('dzisiejszych jedzących je')],['Jeden okres jedzenia',(lifeM(cMid)>60?'60+':lifeM(cMid).toFixed(1).replace('.',','))+' mies.',sm('~'+zl(Math.min(60,lifeM(cMid))*monRev)+' przychodu')],['Liczebność za 6 mies.',N(L6),dl0(L6,T,0,v=>N(v)+' vs dziś')]],
   fcChart().replace('viewBox="0 0 680 320"','viewBox="0 0 680 300"'),
-  [[['Szansa pozostania miesiąc po miesiącu',survChart()],['Liczebność segmentu i stan równowagi ('+N(EQ)+')',szChart()]],[[nxt?'Awans do wyższego segmentu: '+nxt.n:'Utrzymanie w najwyższym segmencie',upHTML]],[['Jak liczymy',fcHow.replace('<div class="kt-how"><span class="cz-eb">Jak liczymy</span>','<div class="kt-how2">')]]]);
+  [[['Szansa pozostania miesiąc po miesiącu',survChart()],['Liczebność segmentu i stan równowagi ('+N(EQ)+')',szChart()]],[[nxt?'Awans do wyższego segmentu: '+nxt.n:'Utrzymanie w najwyższym segmencie',upHTML]]]);
+ if(!DOCS.kt_prog.b0)DOCS.kt_prog.b0=DOCS.kt_prog.b;DOCS.kt_prog.b=DOCS.kt_prog.b0+'<h4>Jak liczymy (liczby tego segmentu)</h4>'+fcHow.replace('<div class="kt-how"><span class="cz-eb">Jak liczymy</span>','<div class="kt-how2 kt-howpop">');
  // --- KIM SĄ ---
  const top4=ixs.filter(d=>d.gi<999&&d.gi>100).slice(0,4),bot2=ixs.filter(d=>d.gi<999&&d.gi<100).slice(-2).reverse();
  const prof2=BIG('Najbardziej ich wyróżnia',best?(best.i/100).toFixed(1).replace('.',',')+'×':'–','var(--good)','',best?`${best.l}: ${Math.round(best.a*100)}% w segmencie vs ${Math.round(best.b*100)}% — ${cmpName}.`:'',
