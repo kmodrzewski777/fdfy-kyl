@@ -255,6 +255,22 @@ SEGH = {'dates': sorted(hist)[-90:]}
 SEGH['v'] = {g: [hist[d].get(g) for d in SEGH['dates']] for g in list(HG) + ['all']}
 s['H'] = {'RET90': C.get('ret90.all', 0), 'SEGX': SEGX, 'WKD': WKD, 'SEGH': SEGH, 'WAITB': WAITB, 'EMR': EMR, 'APPR': APPR, 'CHURNP': CHURNP, 'WT': WT, 'NCR': NCR, 'NK': NK, 'NCSEC': NCSEC, 'FLOWS': FLOWS,
           'DMAP': {'asof': raw['asof'], 'b': DMAP_B, 'g': {g: [NAMES[g], dm[g]] for g in NAMES}}}
+# ---------- GR (Gryzy: points_value + event gadget_earned) ----------
+GL = ['0', '1–100', '101–500', '501–1000', '1001–3000', '3000+']
+GX = raw.get('gryzy_ex', {'rows': []}); gr_rows = GX['rows']
+gc, gcost, gday = {}, {}, {}
+for d_, sp, gs, pv in gr_rows:
+    gday[d_] = gday.get(d_, 0) + 1
+    for g in gs: gc[g] = gc.get(g, 0) + 1
+    if len(gs) == 1: gcost.setdefault(gs[0], []).append(sp)
+g0 = dt.date.fromisoformat(GX.get('from', raw['asof'])); g1 = dt.date.fromisoformat(GX.get('to', raw['asof']))
+gdays = [(g0 + dt.timedelta(i)).isoformat() for i in range((g1 - g0).days + 1)]
+s['GR'] = {'b': [[GL[i], C.get('gr.b%d' % i, 0), C.get('gr.eat%d' % i, 0), C.get('gr.ina%d' % i, 0), C.get('gr.app%d' % i, 0)] for i in range(6)],
+           'ex': C.get('gr.ex', 0), 'ex30': C.get('gr.ex30', 0), 'exEat': C.get('gr.exEat', 0), 'exIna': C.get('gr.exIna', 0), 'exApp': C.get('gr.exApp', 0),
+           'n': len(gr_rows), 'spent': sum(r[1] for r in gr_rows), 'items': sum(len(r[2]) for r in gr_rows),
+           'after': [sum(1 for r in gr_rows if lo <= r[3] < hi) for lo, hi in ((0, 100), (100, 500), (500, 1000), (1000, 3000), (3000, 10**9))],
+           'top': sorted([[g, n, min(gcost[g]) if g in gcost else None] for g, n in gc.items()], key=lambda x: -x[1]),
+           'days': [[lab(dt.date.fromisoformat(x)), gday.get(x, 0)] for x in gdays], 'from': GX.get('from'), 'to': GX.get('to')}
 s['asOf'] = raw['asof']; s['updatedAt'] = int(time.time() * 1000); s['v'] = 1
 json.dump(s, open(os.path.join(D, 'snapshot.json'), 'w'), ensure_ascii=False)
 print('OK', raw['asof'], '| RB.n', RB['n'], '| LEAD.tot', L['tot'], '| NCR', len(NCR), '| WT', WT, '| NCSEC', NCSEC, '| FLOWS.days', nd,
