@@ -228,7 +228,7 @@ DMAP_B = [['0–3', 0, 3, 650], ['4–7', 4, 7, 651], ['8–14', 8, 14, 814], ['
 # strona przy otwarciu czyta dane z bazy (applyData: klucze snapshotu + s['H']) i sama się przelicza/renderuje.
 s['APP'] = APP
 # SEGX: dane do kart segmentów (podstrony) — liczniki sg.<R>.<klucz> z queries.json
-SGK = ('o642', 'o643', 'o644', 'o645', 'o646', 'o647', 'o648', 'b7', 'b14', 'b30', 'b60', 'b90', 'm30', 'disc', 'disc3', 'p8', 'w1', 'w2', 'w3', 'w4', 'w5', 'eo30', 'ec30', 'sun', 'aop30', 'aop7', 'abA', 'abW')
+SGK = ('o642', 'o643', 'o644', 'o645', 'o646', 'o647', 'o648', 'b7', 'b14', 'b30', 'b60', 'b90', 'm30', 'disc', 'disc3', 'p8', 'w1', 'w2', 'w3', 'w4', 'w5', 'eo30', 'ec30', 'sun', 'aop30', 'aop7', 'abA', 'abW', 'ret90')
 SEGX = {g: {k: C['sg.%s.%s' % (g, k)] for k in SGK} for g in ('R1', 'R2', 'R3', 'R4', 'R5')}
 # WKD: weekend. o = zamówienia per dzień (ostatnie 8 pełnych tygodni do wczoraj), d = dostawy w najbliższe 2 weekendy
 # z harmonogramów (najnowsze zdarzenie diet_delivery_schedule per dieta, logi ~30 dni wstecz).
@@ -253,7 +253,7 @@ WKD['act'] = row['all'][1]  # aktywni (jedzą teraz) jako mianownik udziału
 json.dump(raw, open(os.path.join(D, 'raw.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
 SEGH = {'dates': sorted(hist)[-90:]}
 SEGH['v'] = {g: [hist[d].get(g) for d in SEGH['dates']] for g in list(HG) + ['all']}
-s['H'] = {'SEGX': SEGX, 'WKD': WKD, 'SEGH': SEGH, 'WAITB': WAITB, 'EMR': EMR, 'APPR': APPR, 'CHURNP': CHURNP, 'WT': WT, 'NCR': NCR, 'NK': NK, 'NCSEC': NCSEC, 'FLOWS': FLOWS,
+s['H'] = {'RET90': C.get('ret90.all', 0), 'SEGX': SEGX, 'WKD': WKD, 'SEGH': SEGH, 'WAITB': WAITB, 'EMR': EMR, 'APPR': APPR, 'CHURNP': CHURNP, 'WT': WT, 'NCR': NCR, 'NK': NK, 'NCSEC': NCSEC, 'FLOWS': FLOWS,
           'DMAP': {'asof': raw['asof'], 'b': DMAP_B, 'g': {g: [NAMES[g], dm[g]] for g in NAMES}}}
 s['asOf'] = raw['asof']; s['updatedAt'] = int(time.time() * 1000); s['v'] = 1
 json.dump(s, open(os.path.join(D, 'snapshot.json'), 'w'), ensure_ascii=False)
