@@ -285,5 +285,12 @@ s['GR']['cmp'] = {str(p_): {'cur': gwin(0, p_), 'prev': gwin(p_, 2 * p_) if (dt.
 s['GR']['ex90'] = C.get('gr.ex90', 0)
 s['asOf'] = raw['asof']; s['updatedAt'] = int(time.time() * 1000); s['v'] = 1
 json.dump(s, open(os.path.join(D, 'snapshot.json'), 'w'), ensure_ascii=False)
+# ---------- archiwum dzienne: pełny zrzut liczników i wyliczeń, nigdy nie nadpisywany innym dniem ----------
+os.makedirs(os.path.join(D, 'history'), exist_ok=True)
+json.dump({'asof': raw['asof'], 'counts': C, 'purchases_yesterday': raw.get('purchases_yesterday'), 'camp': raw.get('camp'),
+           'sample': raw.get('sample', {}).get(str(D0 - dt.timedelta(1))), 'orders_day': {k: v for k, v in raw.get('orders_day', {}).items() if k >= str(D0 - dt.timedelta(7))},
+           'gryzy_ex': [r for r in raw.get('gryzy_ex', {}).get('rows', []) if r[0] >= str(D0 - dt.timedelta(7))],
+           'snapshot': {k: s[k] for k in s if k not in ('updatedAt',)}},
+          open(os.path.join(D, 'history', raw['asof'] + '.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
 print('OK', raw['asof'], '| RB.n', RB['n'], '| LEAD.tot', L['tot'], '| NCR', len(NCR), '| WT', WT, '| NCSEC', NCSEC, '| FLOWS.days', nd,
       '| rozmiar dokumentu %.0f KB' % (len(json.dumps(s, ensure_ascii=False).encode()) / 1024))
