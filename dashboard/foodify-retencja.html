@@ -1319,6 +1319,11 @@ html{scroll-behavior:smooth}section[id],div.pdiv[id]{scroll-margin-top:80px}@med
 .alr.a0{background:var(--surface-2);color:var(--muted)}.alr.a1{background:#e8f5ec;color:#1f7a3f}.alr.a4{background:#d7f0df;color:#126b33}.alr.a2{background:#fff1d6;color:#9a6200}.alr.a3{background:#fde2e2;color:#b42318}
 .wtx{font-size:12.5px;color:var(--muted)}
 @media (max-width:1500px){.st-kpi{grid-template-columns:repeat(3,minmax(0,1fr))}}@media (max-width:1300px){.zcols{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kt-hero2{grid-template-columns:2fr minmax(300px,1fr)!important;column-gap:56px!important}.kt-hero2 .kt-idb{order:-1}.kt-hero2 .sc-main{padding-left:40px;border-left:1px solid var(--line,#ebe9e9)}
+.kt-hero2 .kt-m4{grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin-top:28px;border-top:1px solid var(--line,#ebe9e9);padding-top:24px}.kt-hero2 .kt-m{background:none;border-radius:0;padding:0 24px;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:12px;border-left:1px solid var(--line,#ebe9e9)}.kt-hero2 .kt-m:first-child{padding-left:0;border-left:0}
+.kt-hero2 .kt-m span{font-size:15px}.kt-hero2 .kt-m b{font-size:44px;letter-spacing:-.04em}.kt-hero2 .kt-m small{font-size:14px}.kt-hero2 .kt-m .dlt{font-size:13.5px}.kt-hero2 .kt-mr{width:56px;height:56px;order:-1}.kt-hero2 .kt-m>div{gap:6px}.kt-hero2 .kt-msp{width:100%;height:56px;order:-1}
+@media (max-width:1400px){.kt-hero2 .sc-main{padding-left:0;border-left:0}.kt-hero2 .kt-m4{grid-template-columns:1fr 1fr;row-gap:24px}.kt-hero2 .kt-m:nth-child(3){padding-left:0;border-left:0}}
+@media (max-width:700px){.kt-hero2 .kt-m b{font-size:32px}}
 </style>
 <div class="wrap">
 <header class="top">
@@ -2735,7 +2740,7 @@ function renderKarta(k,keep){const box=document.getElementById('karta');if(!box)
  const h=me.hist.length>1?me.hist:[T,T],mn=Math.min(...h),mx=Math.max(...h),sp=(mx-mn)||1,pts=h.map((v,i)=>(i*(160/(h.length-1))).toFixed(1)+','+(44-(v-mn)/sp*40).toFixed(1)).join(' ');
  const spark=`<svg viewBox="0 0 160 48" class="kt-msp" preserveAspectRatio="none"><polygon points="0,48 ${pts} 160,48" fill="#ff5456" fill-opacity=".12"/><polyline points="${pts}" fill="none" stroke="#ff5456" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg>`;
  const yrs=MS.map(m=>m.rev/Math.max(1,m.tot)*12/11),yrMax=Math.max(...yrs,1);
- return `<div class="kt-m kt-mw" data-t="<b>Klienci w segmencie</b><br>${N(h[0])} → ${N(T)} w ${h.length} dni"><span>Klienci</span><b>${N(T)}</b>${spark}${dl0(eS-lS,0,0,v=>N(v)+' w 30 dni')}</div>
+ return `<div class="kt-m kt-mw" data-t="<b>Klienci w segmencie</b><br>${N(h[0])} → ${N(T)} w ${h.length} dni">${spark}<div><span>Klienci</span><b>${N(T)}</b>${dl0(eS-lS,0,0,v=>N(v)+' w 30 dni')}</div></div>
  <div class="kt-m" data-t="<b>Udział w bazie</b><br>${N(T)} z ${N(base.tot)} klientów"><div><span>Udział w bazie</span><b>${P(T,base.tot)}</b><small>z ${N(base.tot)} klientów</small></div>${ring(R(T,base.tot),'#5f636a')}</div>
  <div class="kt-m" data-t="<b>Udział w przychodzie (LTV)</b><br>~${zl(me.rev)} z ~${zl(base.rev)}"><div><span>Udział w przychodzie</span><b>${P(me.rev,base.rev)}</b><small>~${zl(me.rev)} LTV</small></div>${ring(R(me.rev,base.rev),'#ff5456')}</div>
  <div class="kt-m" data-t="<b>Przychód / klient / rok</b><br>${MS.map((m,i)=>m.n+': ~'+zl(yrs[i])).join('<br>')}"><div><span>Przychód / klient / rok</span><b>~${zl(yr)}</b>${dl0(yr,yrC,0,v=>'~'+zl(v)+' vs '+cmpName)}</div>${ring(yr/yrMax,'#ff9061')}</div>`;})()}</div></div>
