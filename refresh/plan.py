@@ -17,9 +17,14 @@ for k, f in json.load(open(os.path.join(D, 'queries.json'))):
 # segment: (od kiedy potrzebna historia, potrzebne pola). raw.membership trzyma całą historię — pobieraj tylko brakujące dni + ostatnie 8.
 NEED = {528: ('2026-07-06', 't'), 488: ('2026-07-01', 'e'), 551: ('2026-07-14', 'elt'), 636: ('2026-09-28', 'e'), 639: ('2026-09-28', 'e'),
         531: ('2026-07-16', 'elt')}
-for g in (28, 51, 71, 75, 523): NEED[g] = ('2025-10-01', 't')
-for g in (143, 145, 146, 147, 149): NEED[g] = (str(D0 - dt.timedelta(29)), 'elt')
+for g in (28, 75, 523): NEED[g] = ('2025-10-01', 't')
+for g in (51, 71): NEED[g] = ('2025-10-01', 'et')
+# miesięczne porównanie (MOM): segmenty z historią dzienną od 1. dnia dwóch miesięcy wstecz
+M0 = (D0.replace(day=1) - dt.timedelta(1)).replace(day=1); M0 = (M0 - dt.timedelta(1)).replace(day=1)
+for g, fl in ((54, 'e'), (425, 'elt'), (616, 'elt'), (643, 'e'), (537, 't'), (552, 't'), (676, 't')): NEED[g] = (str(M0), fl)
+for g in (143, 145, 146, 147, 149): NEED[g] = (str(min(D0 - dt.timedelta(29), M0)), 'elt')
 NEED[655] = (str(D0 - dt.timedelta(29)), 'e')
+print('\n# 1b. DATY UTWORZENIA SEGMENTÓW  path=/v1/environments/190673/segments jq=[.segments[]|[(.id|tostring),(.created_at//.created)]]|map({(.[0]):.[1]})|add|tojson  ->  put.py seg_created \'<wynik>\'  (dni przed utworzeniem segmentu = brak danych, nie zero)')
 print('\n# 2. CZŁONKOSTWO  path=/v1/environments/{environment_id}/metrics/segment_membership  params={environment_id:190673,segment_id,resolution:"days",start,end}')
 print('#    jq: .membership_metric|[<pola>]|tojson  gdzie pole: e=.entered l=.left t=.total, brak pola = []  (np. pola "t" -> [[],[],.total])')
 print('#    ->  put.py membership/<seg> \'{"start":"<data startu>","v":<wynik>}\'   (scalanie po datach, historia zostaje)')

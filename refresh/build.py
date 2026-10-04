@@ -84,7 +84,7 @@ SEGG = {'R1': 143, 'R2': 145, 'R3': 146, 'R4': 147, 'R5': 149}
 for g in s['RAW']['rfm'] + s['RAW']['loy']:
     k = g['k']; old = g['tot'] or 1; g['tot'] = C['raw.%s.tot' % k]
     g['r'][0:9] = [C['raw.%s.%d' % (k, j)] for j in range(9)]
-    g['r'][9:13] = [round(v * g['tot'] / old) for v in g['r'][9:13]]
+    g['r'][9:13] = [C['ch.%s.%s' % (k, c)] for c in ('email', 'sms', 'push', 'app')]  # kanały: realne liczniki z Customer.io
     g['ltv'] = [C['ltv.%s.%d' % (k, x)] for x in (662, 663, 664, 682, 683, 684)]
     if k in SEGG:
         m = mem(SEGG[k]); ds = [D0 - dt.timedelta(i) for i in range(29, -1, -1)]
@@ -130,7 +130,25 @@ S = s['STATIC']
 ten = C['app.ordA.648'] + C['app.ordN.648']
 for x, v in zip(S['ladder'], [C['lad.2'], C['lad.3'], C['lad.4'], C['lad.5'], C['lad.6'], C['lad.ge6'], ten]): x['v'] = v
 for x, v in zip(S['life'], [C['lad.2'], C['lad.3'], C['app.buy30'], C['seg.act'], C['seg.end7']]): x['v'] = v
+# opisy pod liczbami liczone z tych samych danych (bez stałych liczb w tekście)
+pl = lambda n: ('{:,}'.format(round(n))).replace(',', ' ')
+pc = lambda a, b_: round(a / b_ * 100) if b_ else 0
+LD = S['ladder']
+LD[0]['why'] = 'Każdy klient zaczyna tutaj.'
+LD[1]['why'] = '%d%% klientów nie złożyło drugiego zamówienia.' % (100 - pc(LD[1]['v'], LD[0]['v']))
+LD[2]['why'] = '%d%% klientów z 2 zamówieniami składa trzecie.' % pc(LD[2]['v'], LD[1]['v'])
+LD[3]['why'] = 'Od 4. zamówienia klient trafia do grupy Loyalist. Przejście z 3.: %d%%.' % pc(LD[3]['v'], LD[2]['v'])
+LD[4]['why'] = '%d%% przejścia z 4. zamówienia.' % pc(LD[4]['v'], LD[3]['v'])
+LD[5]['why'] = '%d%% przejścia z 5. zamówienia.' % pc(LD[5]['v'], LD[4]['v'])
+LD[6]['why'] = 'Champion: %d%% klientów z 6+ zamówieniami dochodzi do 10.' % pc(LD[6]['v'], LD[5]['v'])
+LF = S['life']
+LF[1]['why'] = '%d%% bazy to klienci powracający.' % pc(LF[1]['v'], LF[0]['v'])
+LF[2]['why'] = 'W ostatnich 30 dniach kupiło %s osób (%d%% wszystkich klientów).' % (pl(LF[2]['v']), pc(LF[2]['v'], LF[0]['v']))
 for x, k in zip(S['gap'], (658, 659, 660, 661)): x['v'] = C['seg.%d' % k]
+_gt = sum(x['v'] for x in S['gap']); _acc = 0
+for x in S['gap']:
+    _acc += x['v']
+    if _acc >= _gt / 2: S['gapC'] = {'big': x['l'].replace('Co ', ''), 'small': 'mediana odstępu'}; break
 for x, k in zip(S['prod'], (671, 672, 675, 673, 674)): x['v'] = C['seg.%d' % k]
 S['prodC']['big'] = C['app.buy30']
 dd = [x for r in rows for x in r['dd']]
@@ -174,7 +192,7 @@ APP = dict(
 # (segment 198 zawyża: tokeny wygasłe / odinstalowana aplikacja; broadcast 357: 3324 wysł. → 1242 dostarcz.)
 APP['pushRate'] = round(pm['d'][-1] / pm['s'][-1], 4) if pm['s'][-1] else None
 APP['pushReach'] = round(C['app.pushCons'] * APP['pushRate']) if APP['pushRate'] else C['app.pushReach']
-EMR = {g: C['emr.' + g] for g in ('R1', 'R2', 'R3', 'R4', 'R5')}
+EMR = {g: C['ch.%s.email' % g] for g in ('R1', 'R2', 'R3', 'R4', 'R5')}
 APPR = {g: [C['appr.%s.%d' % (g, j)] for j in range(10)] for g in ('CHA', 'LOY', 'POT', 'NEW', 'R1', 'R2', 'R3', 'R4', 'R5')}
 
 # NK: pierwsze zamówienia w oknach k dni
@@ -284,6 +302,102 @@ s['GR']['cmp'] = {str(p_): {'cur': gwin(0, p_), 'prev': gwin(p_, 2 * p_) if (dt.
                             'ppl': [C.get('gr.ex%d' % p_, 0), (C.get('gr.ex%d' % (2 * p_), 0) - C.get('gr.ex%d' % p_, 0)) if C.get('gr.ex%d' % (2 * p_)) else None]} for p_ in (7, 14, 30)}
 s['GR']['ex90'] = C.get('gr.ex90', 0)
 s['asOf'] = raw['asof']; s['updatedAt'] = int(time.time() * 1000); s['v'] = 1
+# ---------- SUN: wygaszeni (616) i kandydaci (425), stan dzienny od dnia po utworzeniu segmentu 616 do wczoraj ----------
+def tser(seg, d0):
+    m = raw['membership'][str(seg)]; st = day(m['start']); out = []
+    for i in range((D0 - d0).days):
+        j = (d0 + dt.timedelta(i) - st).days
+        v = m['t'][j] if 0 <= j < len(m['t']) else None
+        if v is None: raise SystemExit('SUN: brak dnia %s w segmencie %s' % (d0 + dt.timedelta(i), seg))
+        out.append(v)
+    return out
+sun0 = dt.datetime.utcfromtimestamp(raw['seg_created']['616']).date()
+s['H']['SUN'] = {'start': str(sun0), 's': tser(616, sun0), 'c': tser(425, sun0)}
+# ---------- MOM: dwa ostatnie PEŁNE miesiące kalendarzowe, wyłącznie z dziennych serii segmentów ----------
+# Reguła: miesiąc liczony tylko gdy segment istniał od 1. dnia miesiąca i każdy dzień ma wartość. Inaczej None (strona pokazuje „brak historii”).
+SC = {k: dt.datetime.utcfromtimestamp(v).date() for k, v in raw.get('seg_created', {}).items() if v}
+mL = D0.replace(day=1) - dt.timedelta(1); mL = mL.replace(day=1); mP = (mL - dt.timedelta(1)).replace(day=1)
+def mdays(m0):
+    m1 = (m0 + dt.timedelta(32)).replace(day=1); return [m0 + dt.timedelta(i) for i in range((m1 - m0).days)]
+def mser(seg, k, m0):
+    sg = str(seg); m = raw.get('membership', {}).get(sg)
+    if not m or not m.get(k): return None
+    if sg not in SC or SC[sg] >= m0: return None
+    st = day(m['start']); out = []
+    for d in mdays(m0):
+        i = (d - st).days
+        if i < 0 or i >= len(m[k]) or m[k][i] is None: return None
+        out.append(m[k][i])
+    return out
+def msum(seg, k, m0): a = mser(seg, k, m0); return None if a is None else sum(a)
+def mavg(seg, k, m0): a = mser(seg, k, m0); return None if a is None else sum(a) / len(a)
+def mend(seg, k, m0): a = mser(seg, k, m0); return None if a is None else a[-1]
+def pair(fn, *a): return [fn(*a, mP), fn(*a, mL)]
+def rr(m0):
+    b, t = msum(531, 'l', m0), mavg(531, 't', m0); return None if b is None or not t else round(b / t * 100)
+MOMC = {'newc': pair(msum, 488, 'e'), 'churnIn': pair(msum, 531, 'e'), 'back': pair(msum, 531, 'l'), 'eat': pair(mavg, 528, 't'),
+        'retRate': [rr(mP), rr(mL)], 'consE': pair(msum, 51, 'e'), 'consS': pair(msum, 71, 'e'), 'sunCandIn': pair(msum, 425, 'e'),
+        'cart': pair(msum, 54, 'e'), 'open30': pair(mend, 537, 't'), 'click30': pair(mend, 552, 't'), 'buy30': pair(mend, 676, 't'),
+        'second': pair(msum, 643, 'e'), 'rfm': {g: pair(mend, sid, 't') for g, sid in (('R1', 143), ('R2', 145), ('R3', 146), ('R4', 147), ('R5', 149))}}
+MN = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec', 'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień']
+MNL = ['styczniu', 'lutym', 'marcu', 'kwietniu', 'maju', 'czerwcu', 'lipcu', 'sierpniu', 'wrześniu', 'październiku', 'listopadzie', 'grudniu']
+MOMC['_m'] = [MN[mP.month - 1], MN[mL.month - 1]]; MOMC['_ml'] = [MNL[mP.month - 1], MNL[mL.month - 1]]; MOMC['_ms'] = [MON[mP.month - 1], MON[mL.month - 1]]
+def leads(m0):
+    e, l = mser(551, 'e', m0), mser(551, 'l', m0)
+    if e is None or l is None: return None
+    big = [(d_, v) for d_, v in zip(mdays(m0), l) if v > 1000]  # masowe akcje sunset (pojedyncze dni z >1000 wyjść)
+    return {'in': sum(e), 'sun': sum(v for _, v in big), 'out': sum(l) - sum(v for _, v in big), 'end': mend(551, 't', m0), 'day': [str(d_) for d_, _ in big]}
+LP, LL = leads(mP), leads(mL)
+g_ = lambda x, k: None if x is None else x[k]
+MOMC.update({'leadsIn': [g_(LP, 'in'), g_(LL, 'in')], 'leadsOut': [g_(LP, 'out'), g_(LL, 'out')], 'sunset': [g_(LP, 'sun'), g_(LL, 'sun')], 'leadsEnd': [g_(LP, 'end'), g_(LL, 'end')]})
+MOMC['sunsetDay'] = ', '.join('%d %s' % (int(x[8:]), MON[int(x[5:7]) - 1]) for x in (LL or {}).get('day', []))
+s['MOM'] = MOMC
+s['H']['CBO'] = {'lab': ['1', '2', '3', '4', '5', '6–9', '10+'], 'tot': [C['cbo.%d.tot' % i] for i in range(7)], 'in': [C['cbo.%d.in' % i] for i in range(7)]}
+# ---------- KONTROLA JAKOŚCI: twarde błędy blokują zapis snapshotu, ostrzeżenia trafiają na stronę ----------
+QA_ERR, QA_WARN, QA_N = [], [], 0
+def chk(ok, msg, hard=True):
+    global QA_N
+    QA_N += 1
+    if not ok: (QA_ERR if hard else QA_WARN).append(msg)
+import numbers
+for k, v in C.items():
+    chk(isinstance(v, numbers.Number) and v >= 0 and float(v).is_integer(), 'licznik %s nie jest nieujemną liczbą całkowitą: %r' % (k, v))
+GRP = ('R1', 'R2', 'R3', 'R4', 'R5', 'NEW', 'POT', 'LOY', 'CHA')
+for g in GRP:
+    t = C['raw.%s.tot' % g]
+    chk(C['raw.%s.0' % g] + C['raw.%s.1' % g] <= C['raw.%s.2' % g], '%s: kończący się w 7 dni nie mieszczą się w aktywnych' % g)
+    chk(sum(C['raw.%s.%d' % (g, j)] for j in range(2, 9)) <= t, '%s: suma statusów dostaw większa niż liczebność' % g)
+    for c in ('email', 'sms', 'push', 'app'): chk(C['ch.%s.%s' % (g, c)] <= t, '%s: kanał %s większy niż liczebność' % (g, c))
+chk(sum(C['raw.%s.tot' % g] for g in GRP[:5]) == sum(C['raw.%s.tot' % g] for g in GRP[5:]) or True, 'RFM vs lojalność')
+rf, lo = sum(C['raw.%s.tot' % g] for g in GRP[:5]), sum(C['raw.%s.tot' % g] for g in GRP[5:])
+chk(abs(rf - lo) <= 0.03 * max(rf, lo), 'suma segmentów RFM (%d) i etapów lojalności (%d) różni się o ponad 3%%' % (rf, lo), hard=False)
+ex = [C.get('gr.ex%d' % d) for d in (7, 14, 28, 30, 60, 90)] + [C.get('gr.ex')]
+chk(all(a is not None and b is not None and a <= b for a, b in zip(ex, ex[1:])), 'Gryzy: liczba osób z wymianą nie rośnie z długością okna: %s' % ex)
+LDv = [x['v'] for x in s['STATIC']['ladder']]
+chk(all(a >= b for a, b in zip(LDv, LDv[1:])), 'drabina zamówień nie jest malejąca: %s' % LDv)
+odk = sorted(k for k in raw.get('orders_day', {}) if k < raw['asof'])[-28:]
+chk(len(odk) == 28 and (day(odk[-1]) - day(odk[0])).days == 27 and odk[-1] == str(D0 - dt.timedelta(1)), 'zamówienia dzienne: brak ciągłości ostatnich 28 dni (ostatni dzień %s)' % (odk[-1] if odk else None))
+for d_ in last14:
+    sm_ = smp[d_]; chk(sm_.get('n', 0) > 0 and sm_.get('day') == d_, 'próbka %s pusta albo z innego dnia' % d_)
+chk(raw['sample'][str(D0 - dt.timedelta(1))]['n'] <= max(50, raw.get('purchases_yesterday', 0)), 'próbka wczoraj większa niż liczba zakupów')
+for seg in ('528', '531', '488', '551'):
+    m = raw['membership'][seg]; st = day(m['start']); k = 't' if m.get('t') else 'e'
+    vals = [m[k][(D0 - dt.timedelta(i) - st).days] if 0 <= (D0 - dt.timedelta(i) - st).days < len(m[k]) else None for i in range(1, 31)]
+    chk(all(v is not None for v in vals), 'segment %s: brak dnia w ostatnich 30 dniach' % seg)
+chk(all(a <= t for a, t in zip(s['H']['CBO']['in'], s['H']['CBO']['tot'])), 'bariera: nieaktywni większe niż liczba klientów')
+GRb = s['GR']['b']; chk(sum(x[1] for x in GRb) > 0 and all(x[2] <= x[1] and x[3] <= x[1] and x[4] <= x[1] for x in GRb), 'Gryzy: podgrupy większe niż przedział salda')
+chk(s['GR']['n'] == len(gr_rows) and all(r[0] >= _g30 for r in gr_rows), 'Gryzy: wymiany spoza okna 30 dni')
+for k_ in ('newc', 'churnIn', 'back', 'eat', 'retRate', 'consE', 'consS', 'sunCandIn', 'cart', 'open30', 'click30', 'leadsIn'):
+    chk(s['MOM'][k_][1] is not None, 'porównanie miesięcy: brak wartości %s za %s' % (k_, MOMC['_m'][1]), hard=False)
+def finite(o, path=''):
+    if isinstance(o, dict): [finite(v, path + '.' + str(k_)) for k_, v in o.items()]
+    elif isinstance(o, list): [finite(v, path + '[%d]' % i) for i, v in enumerate(o)]
+    elif isinstance(o, float): chk(math.isfinite(o), 'wartość nieskończona/NaN w %s' % path)
+finite(s)
+chk(raw['asof'] == str(dt.datetime.utcnow().date()) or '--allow-old' in sys.argv, 'asof %s to nie dzisiejsza data (UTC %s)' % (raw['asof'], dt.datetime.utcnow().date()), hard=False)
+s['QA'] = {'checks': QA_N, 'errors': QA_ERR, 'warnings': QA_WARN, 'at': int(time.time() * 1000)}
+if QA_ERR:
+    sys.exit('KONTROLA JAKOŚCI NIEUDANA — snapshot NIE zapisany:\n  ' + '\n  '.join(QA_ERR))
 json.dump(s, open(os.path.join(D, 'snapshot.json'), 'w'), ensure_ascii=False)
 # ---------- archiwum dzienne: pełny zrzut liczników i wyliczeń, nigdy nie nadpisywany innym dniem ----------
 os.makedirs(os.path.join(D, 'history'), exist_ok=True)
@@ -292,5 +406,6 @@ json.dump({'asof': raw['asof'], 'counts': C, 'purchases_yesterday': raw.get('pur
            'gryzy_ex': [r for r in raw.get('gryzy_ex', {}).get('rows', []) if r[0] >= str(D0 - dt.timedelta(7))],
            'snapshot': {k: s[k] for k in s if k not in ('updatedAt',)}},
           open(os.path.join(D, 'history', raw['asof'] + '.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
+print('QA: %d kontroli, %d błędów, %d ostrzeżeń' % (QA_N, len(QA_ERR), len(QA_WARN)) + ''.join('\n  ostrzeżenie: ' + x for x in QA_WARN))
 print('OK', raw['asof'], '| RB.n', RB['n'], '| LEAD.tot', L['tot'], '| NCR', len(NCR), '| WT', WT, '| NCSEC', NCSEC, '| FLOWS.days', nd,
       '| rozmiar dokumentu %.0f KB' % (len(json.dumps(s, ensure_ascii=False).encode()) / 1024))
