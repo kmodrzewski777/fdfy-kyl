@@ -327,6 +327,19 @@ def tser(seg, d0):
     return out
 sun0 = dt.datetime.utcfromtimestamp(raw['seg_created']['616']).date()
 s['H']['SUN'] = {'start': str(sun0), 's': tser(616, sun0), 'c': tser(425, sun0)}
+# ---------- SEC2 (drugie zamówienie) i INA (nieaktywni) ----------
+def dser(seg, k, d0):
+    m = raw['membership'][str(seg)]; st = day(m['start']); o = []
+    for i in range((D0 - d0).days):
+        j = (d0 + dt.timedelta(i) - st).days
+        o.append(m[k][j] if 0 <= j < len(m[k] or []) else None)
+    return o
+c642 = dt.datetime.utcfromtimestamp(raw['seg_created']['642']).date() + dt.timedelta(1)
+s['H']['SEC2'] = {'start': str(c642), 'sec': dser(642, 'l', c642), 'first': dser(642, 'e', c642),
+                  'n1': C['cbo.0.tot'], 'in1': C['cbo.0.in']}
+i531 = day(raw['membership']['531']['start'])
+s['H']['INA'] = {'start': str(i531), 'e': dser(531, 'e', i531), 'l': dser(531, 'l', i531), 't': dser(531, 't', i531),
+                 'ch': {k: C['in.' + k] for k in ('email', 'sms', 'push', 'app')}, 'n745': C.get('seg.745') or (raw['membership']['745']['t'] or [None])[-1]}
 # ---------- MOM: dwa ostatnie PEŁNE miesiące kalendarzowe, wyłącznie z dziennych serii segmentów ----------
 # Reguła: miesiąc liczony tylko gdy segment istniał od 1. dnia miesiąca i każdy dzień ma wartość. Inaczej None (strona pokazuje „brak historii”).
 SC = {k: dt.datetime.utcfromtimestamp(v).date() for k, v in raw.get('seg_created', {}).items() if v}
@@ -399,6 +412,8 @@ for seg in ('528', '531', '488', '551'):
     vals = [m[k][(D0 - dt.timedelta(i) - st).days] if 0 <= (D0 - dt.timedelta(i) - st).days < len(m[k]) else None for i in range(1, 31)]
     chk(all(v is not None for v in vals), 'segment %s: brak dnia w ostatnich 30 dniach' % seg)
 chk(all(a <= t for a, t in zip(s['H']['CBO']['in'], s['H']['CBO']['tot'])), 'bariera: nieaktywni większe niż liczba klientów')
+chk(all(v is not None for v in s['H']['INA']['e'][-30:] + s['H']['INA']['l'][-30:]), 'nieaktywni: brak dni w historii odpływu/powrotów')
+chk(all(s['H']['INA']['ch'][k] <= s['H']['INA']['n745'] for k in s['H']['INA']['ch']), 'nieaktywni: kanał większy niż liczba nieaktywnych')
 GRb = s['GR']['b']; chk(sum(x[1] for x in GRb) > 0 and all(x[2] <= x[1] and x[3] <= x[1] and x[4] <= x[1] for x in GRb), 'Gryzy: podgrupy większe niż przedział salda')
 chk(s['GR']['n'] == len(gr_rows) and all(r[0] >= _g30 for r in gr_rows), 'Gryzy: wymiany spoza okna 30 dni')
 for k_ in ('newc', 'churnIn', 'back', 'eat', 'retRate', 'consE', 'consS', 'sunCandIn', 'cart', 'open30', 'click30', 'leadsIn'):
