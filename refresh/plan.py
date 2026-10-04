@@ -94,4 +94,5 @@ print('X %s/campaigns/157/channel_metrics, /158/channel_metrics params={period:"
 print('\n# 6b. GRYZY  path=/v1/environments/190673/logs params={type:"event",name:"gadget_earned",limit:100,from:"<D-30>T00:00:00Z",to:"<D-1>T23:59:59Z"} (+continuation)')
 print('#    jq [.logs[]|[(.timestamp|strftime("%Y-%m-%d")),(.attrs.spent/100|floor),(.attrs.gadget|split(", ")),(.attrs.points_value|floor)]]')
 print('#    sklej fragmenty nazw rozbite przecinkiem ("w zapinanej na suwak walizce", "duoball i piłka") -> DOPISZ do raw["gryzy_ex"]["rows"] tylko dni nowsze niż obecne "to" (starszych NIE usuwaj — budują historię do porównań 30 dni), zaktualizuj "to"; "from" zostaje najstarszą datą')
+print('\n# 7b. po build.py: NODE_PATH=$(npm root -g) node refresh/kpi.js && python3 refresh/build.py  (zapis dużych liczb do historii badge porównań)')
 print('\n# 7. python3 refresh/build.py')

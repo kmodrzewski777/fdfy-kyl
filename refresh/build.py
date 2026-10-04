@@ -336,7 +336,7 @@ def dser(seg, k, d0):
     return o
 c642 = dt.datetime.utcfromtimestamp(raw['seg_created']['642']).date() + dt.timedelta(1)
 s['H']['SEC2'] = {'start': str(c642), 'sec': dser(642, 'l', c642), 'first': dser(642, 'e', c642),
-                  'n1': C['cbo.0.tot'], 'in1': C['cbo.0.in'], 'oneStart': str(c642 - dt.timedelta(1)), 'one': dser(642, 't', c642 - dt.timedelta(1)) + [C['cbo.0.tot']]}
+                  'n1': C['cbo.0.tot'], 'in1': C['cbo.0.in'], 'ec': C['ch.NEW.emailCons'], 'es': C['ch.NEW.emailSun'], 'pc': C['ch.NEW.pushCons'], 'oneStart': str(c642 - dt.timedelta(1)), 'one': dser(642, 't', c642 - dt.timedelta(1)) + [C['cbo.0.tot']]}
 i531 = day(raw['membership']['531']['start'])
 s['H']['INA'] = {'start': str(i531), 'e': dser(531, 'e', i531), 'l': dser(531, 'l', i531), 't': dser(531, 't', i531),
                  'ch': {k: C['in.' + k] for k in ('email', 'sms', 'push', 'app')}, 'n745': C.get('seg.745') or (raw['membership']['745']['t'] or [None])[-1]}
@@ -379,6 +379,7 @@ g_ = lambda x, k: None if x is None else x[k]
 MOMC.update({'leadsIn': [g_(LP, 'in'), g_(LL, 'in')], 'leadsOut': [g_(LP, 'out'), g_(LL, 'out')], 'sunset': [g_(LP, 'sun'), g_(LL, 'sun')], 'leadsEnd': [g_(LP, 'end'), g_(LL, 'end')]})
 MOMC['sunsetDay'] = ', '.join('%d %s' % (int(x[8:]), MON[int(x[5:7]) - 1]) for x in (LL or {}).get('day', []))
 s['MOM'] = MOMC
+s['KPIH'] = {k: v for k, v in sorted(raw.get('kpi_hist', {}).items())[-120:]}
 s['H']['CBO'] = {'lab': ['1', '2', '3', '4', '5', '6–9', '10+'], 'tot': [C['cbo.%d.tot' % i] for i in range(7)], 'in': [C['cbo.%d.in' % i] for i in range(7)]}
 # ---------- KONTROLA JAKOŚCI: twarde błędy blokują zapis snapshotu, ostrzeżenia trafiają na stronę ----------
 QA_ERR, QA_WARN, QA_N = [], [], 0
