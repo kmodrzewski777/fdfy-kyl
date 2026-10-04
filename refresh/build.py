@@ -315,6 +315,7 @@ def gwin(a, b):
 s['GR']['cmp'] = {str(p_): {'cur': gwin(0, p_), 'prev': gwin(p_, 2 * p_) if (dt.date.fromisoformat(gto) - dt.date.fromisoformat(GX.get('from', gto))).days + 1 >= 2 * p_ else None,
                             'ppl': [C.get('gr.ex%d' % p_, 0), (C.get('gr.ex%d' % (2 * p_), 0) - C.get('gr.ex%d' % p_, 0)) if C.get('gr.ex%d' % (2 * p_)) else None]} for p_ in (7, 14, 30)}
 s['GR']['ex90'] = C.get('gr.ex90', 0)
+s['GR']['rows'] = GRR; s['GR']['rfrom'] = GX.get('from', gto)
 s['asOf'] = raw['asof']; s['updatedAt'] = int(time.time() * 1000); s['v'] = 1
 # ---------- SUN: wygaszeni (616) i kandydaci (425), stan dzienny od dnia po utworzeniu segmentu 616 do wczoraj ----------
 def tser(seg, d0):
