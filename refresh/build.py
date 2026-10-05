@@ -166,6 +166,7 @@ for k in ('members', 'enr', 'susp', 'buy', 'buy2', 'buy3', 'eatNoBuy', 'disc', '
 P['st'] = {k: C['p8.st.' + k] for k in ('eat', 'r030', 'l30')}
 P['who'] = {k: C['p8.who.' + k] for k in ('lead', 'o1', 'o23', 'o4')}
 P['whoBuy'] = {k: C['p8.whoBuy.' + k] for k in ('lead', 'o1', 'o23', 'o4')}
+P['newc'] = {str(n): C.get('p8.newc.%d' % n) for n in (1, 2, 7, 30, 90)}
 P['rfm'] = {'tot': C['p8.enr'], 'r': [C['p8.rfm.' + g] for g in ('R1', 'R2', 'R3', 'R4', 'R5')]}
 st8 = day('2026-09-28'); n8 = (D0 - st8).days + 1
 P['day'] = {'e': series(636, '2026-09-28', 0), 'b': series(639, '2026-09-28', 0),
