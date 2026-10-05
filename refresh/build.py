@@ -338,6 +338,14 @@ def dser(seg, k, d0):
 c642 = dt.datetime.utcfromtimestamp(raw['seg_created']['642']).date() + dt.timedelta(1)
 s['H']['SEC2'] = {'start': str(c642), 'sec': dser(642, 'l', c642), 'first': dser(642, 'e', c642),
                   'n1': C['cbo.0.tot'], 'in1': C['cbo.0.in'], 'ec': C['ch.NEW.emailCons'], 'es': C['ch.NEW.emailSun'], 'pc': C['ch.NEW.pushCons'], 'oneStart': str(c642 - dt.timedelta(1)), 'one': dser(642, 't', c642 - dt.timedelta(1)) + [C['cbo.0.tot']]}
+def mseries(seg, k):
+    m = raw['membership'].get(str(seg)) or {}
+    if not m.get('start') or not m.get(k): return None
+    c = SCd.get(str(seg)); st = day(m['start']); off = max(0, (c + dt.timedelta(1) - st).days) if c else 0
+    return {'start': str(st + dt.timedelta(off)), 'd': m[k][off:]}
+SCd = {k: dt.datetime.utcfromtimestamp(v).date() for k, v in raw.get('seg_created', {}).items() if v}
+s['H']['B30'] = mseries(676, 't')
+s['H']['R90'] = {'t': mseries(858, 't'), 'l': mseries(858, 'l'), 'e657': mseries(657, 'e')}
 i531 = day(raw['membership']['531']['start'])
 s['H']['INA'] = {'start': str(i531), 'e': dser(531, 'e', i531), 'l': dser(531, 'l', i531), 't': dser(531, 't', i531),
                  'ch': {k: C['in.' + k] for k in ('email', 'sms', 'push', 'app')}, 'n745': C.get('seg.745') or (raw['membership']['745']['t'] or [None])[-1]}
