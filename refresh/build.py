@@ -316,6 +316,12 @@ s['GR']['cmp'] = {str(p_): {'cur': gwin(0, p_), 'prev': gwin(p_, 2 * p_) if (dt.
                             'ppl': [C.get('gr.ex%d' % p_, 0), (C.get('gr.ex%d' % (2 * p_), 0) - C.get('gr.ex%d' % p_, 0)) if C.get('gr.ex%d' % (2 * p_)) else None]} for p_ in (7, 14, 30)}
 s['GR']['ex90'] = C.get('gr.ex90', 0)
 s['GR']['rows'] = GRR; s['GR']['rfrom'] = GX.get('from', gto)
+VAR = {}
+for k_, v_ in C.items():
+    if '@' in k_:
+        b_, vv = k_.split('@', 1); VAR.setdefault(vv, {})[b_] = v_
+        if vv == 'app': VAR.setdefault('d_app', {})[b_] = v_
+s['VAR'] = VAR
 s['asOf'] = raw['asof']; s['updatedAt'] = int(time.time() * 1000); s['v'] = 1
 # ---------- SUN: wygaszeni (616) i kandydaci (425), stan dzienny od dnia po utworzeniu segmentu 616 do wczoraj ----------
 def tser(seg, d0):
@@ -345,10 +351,11 @@ def mseries(seg, k):
     return {'start': str(st + dt.timedelta(off)), 'd': m[k][off:]}
 SCd = {k: dt.datetime.utcfromtimestamp(v).date() for k, v in raw.get('seg_created', {}).items() if v}
 s['H']['B30'] = mseries(676, 't')
+s['H']['INAV'] = {k_: {'t': mseries(g_, 't'), 'e': mseries(g_, 'e'), 'l': mseries(g_, 'l')} for k_, g_ in (('email', 859), ('sms', 860), ('push', 861), ('app', 862), ('d_app', 862), ('d_web', 863))}
 s['H']['R90'] = {'t': mseries(858, 't'), 'l': mseries(858, 'l'), 'e657': mseries(657, 'e')}
 i531 = day(raw['membership']['531']['start'])
 s['H']['INA'] = {'start': str(i531), 'e': dser(531, 'e', i531), 'l': dser(531, 'l', i531), 't': dser(531, 't', i531),
-                 'ch': {k: C['in.' + k] for k in ('email', 'sms', 'push', 'app')}, 'chd': {k: [C.get('in.d%d.%s' % (i, k)) for i in (1, 2, 3)] for k in ('email', 'sms', 'push', 'app')}, 'n745': C.get('seg.745') or (raw['membership']['745']['t'] or [None])[-1]}
+                 'ch': {**{k: C['in.' + k] for k in ('email', 'sms', 'push', 'app')}, 'd_app': C['in.app'], 'd_web': C.get('in.d_web')}, 'chd': {k: [C.get('in.d%d.%s' % (i, k.replace('d_app', 'app'))) for i in (1, 2, 3)] for k in ('email', 'sms', 'push', 'app', 'd_app', 'd_web')}, 'n745': C.get('seg.745') or (raw['membership']['745']['t'] or [None])[-1]}
 # ---------- MOM: dwa ostatnie PEŁNE miesiące kalendarzowe, wyłącznie z dziennych serii segmentów ----------
 # Reguła: miesiąc liczony tylko gdy segment istniał od 1. dnia miesiąca i każdy dzień ma wartość. Inaczej None (strona pokazuje „brak historii”).
 SC = {k: dt.datetime.utcfromtimestamp(v).date() for k, v in raw.get('seg_created', {}).items() if v}
