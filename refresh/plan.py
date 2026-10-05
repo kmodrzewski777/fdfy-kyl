@@ -23,6 +23,7 @@ for g in (51, 71): NEED[g] = ('2025-10-01', 'et')
 M0 = (D0.replace(day=1) - dt.timedelta(1)).replace(day=1); M0 = (M0 - dt.timedelta(1)).replace(day=1)
 for g, fl in ((54, 'e'), (425, 'elt'), (616, 'elt'), (643, 'e'), (537, 't'), (552, 't'), (676, 't')): NEED[g] = (str(M0), fl)
 NEED[858] = ('2026-10-05', 'elt'); [NEED.__setitem__(g_, ('2026-10-05', 'elt')) for g_ in (859, 860, 861, 862, 863)]; NEED[657] = ('2026-10-05', 'e')
+[NEED.__setitem__(g_, ('2026-10-05', 'elt')) for g_ in (873, 874, 875, 876)]
 for g in (143, 145, 146, 147, 149): NEED[g] = (str(min(D0 - dt.timedelta(29), M0)), 'elt')
 for g in (649, 744, 745): NEED[g] = ('2026-10-01', 't')
 NEED[642] = ('2026-10-01', 'elt')

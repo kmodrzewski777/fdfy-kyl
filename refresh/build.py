@@ -327,6 +327,7 @@ for vv in list(VAR) + ['d_web']:
     for i_, k_ in ((1, 'st.d3160'), (2, 'st.d6190'), (3, 'st.d90')):
         if C.get('in.d%d.%s' % (i_, src)) is not None: VAR.setdefault(vv, {})[k_] = C['in.d%d.%s' % (i_, src)]
 s['VAR'] = VAR
+s['RYT'] = {k: C.get('ryt.' + k) for k in ('eat', 'ok', 'zagr', 'odpl', 'nieakt')}
 NKV = {}
 for vv in ('email', 'sms', 'push', 'app', 'd_web'):
     g_ = lambda d: (C.get('nk.p1.%d@%s' % (d, vv)) or 0) + (C.get('nk.p2.%d@%s' % (d, vv)) or 0)
