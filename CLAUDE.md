@@ -4,3 +4,4 @@
 - Wszystkie porównania z przeszłością liczone wyłącznie wg okresu z menu — żadnych własnych okien (7/14/30) ani przełączników.
 - Żadnych porad/rekomendacji ani spekulacji w tekstach — tylko fakty z danych.
 - Nowe segmenty w Customer.io zawsze z prefiksem [Insights] (nie [Dash]).
+- Każde nowe zapytanie (także warianty filtrów @kanał/@d_web) dopisywać do refresh/queries.json, a segmenty historii do NEED w plan.py — wtedy każde odświeżenie pobiera je automatycznie.
