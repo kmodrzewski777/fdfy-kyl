@@ -326,6 +326,13 @@ for vv in list(VAR) + ['d_web']:
     for i_, k_ in ((1, 'st.d3160'), (2, 'st.d6190'), (3, 'st.d90')):
         if C.get('in.d%d.%s' % (i_, src)) is not None: VAR.setdefault(vv, {})[k_] = C['in.d%d.%s' % (i_, src)]
 s['VAR'] = VAR
+NKV = {}
+for vv in ('email', 'sms', 'push', 'app', 'd_web'):
+    g_ = lambda d: (C.get('nk.p1.%d@%s' % (d, vv)) or 0) + (C.get('nk.p2.%d@%s' % (d, vv)) or 0)
+    if C.get('nk.p1.30@%s' % vv) is None: continue
+    NKV[vv] = {1: [g_(1), g_(2) - g_(1)], 7: [g_(7), g_(14) - g_(7)], 30: [g_(30), g_(60) - g_(30)]}
+NKV['d_app'] = NKV.get('app')
+s['H']['NKV'] = NKV
 s['asOf'] = raw['asof']; s['updatedAt'] = int(time.time() * 1000); s['v'] = 1
 # ---------- SUN: wygaszeni (616) i kandydaci (425), stan dzienny od dnia po utworzeniu segmentu 616 do wczoraj ----------
 def tser(seg, d0):
