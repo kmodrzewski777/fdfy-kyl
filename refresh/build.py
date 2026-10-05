@@ -321,6 +321,10 @@ for k_, v_ in C.items():
     if '@' in k_:
         b_, vv = k_.split('@', 1); VAR.setdefault(vv, {})[b_] = v_
         if vv == 'app': VAR.setdefault('d_app', {})[b_] = v_
+for vv in list(VAR) + ['d_web']:
+    src = 'app' if vv == 'd_app' else vv
+    for i_, k_ in ((1, 'st.d3160'), (2, 'st.d6190'), (3, 'st.d90')):
+        if C.get('in.d%d.%s' % (i_, src)) is not None: VAR.setdefault(vv, {})[k_] = C['in.d%d.%s' % (i_, src)]
 s['VAR'] = VAR
 s['asOf'] = raw['asof']; s['updatedAt'] = int(time.time() * 1000); s['v'] = 1
 # ---------- SUN: wygaszeni (616) i kandydaci (425), stan dzienny od dnia po utworzeniu segmentu 616 do wczoraj ----------
