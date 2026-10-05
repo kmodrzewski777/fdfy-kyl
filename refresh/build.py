@@ -348,7 +348,7 @@ s['H']['B30'] = mseries(676, 't')
 s['H']['R90'] = {'t': mseries(858, 't'), 'l': mseries(858, 'l'), 'e657': mseries(657, 'e')}
 i531 = day(raw['membership']['531']['start'])
 s['H']['INA'] = {'start': str(i531), 'e': dser(531, 'e', i531), 'l': dser(531, 'l', i531), 't': dser(531, 't', i531),
-                 'ch': {k: C['in.' + k] for k in ('email', 'sms', 'push', 'app')}, 'n745': C.get('seg.745') or (raw['membership']['745']['t'] or [None])[-1]}
+                 'ch': {k: C['in.' + k] for k in ('email', 'sms', 'push', 'app')}, 'chd': {k: [C.get('in.d%d.%s' % (i, k)) for i in (1, 2, 3)] for k in ('email', 'sms', 'push', 'app')}, 'n745': C.get('seg.745') or (raw['membership']['745']['t'] or [None])[-1]}
 # ---------- MOM: dwa ostatnie PEŁNE miesiące kalendarzowe, wyłącznie z dziennych serii segmentów ----------
 # Reguła: miesiąc liczony tylko gdy segment istniał od 1. dnia miesiąca i każdy dzień ma wartość. Inaczej None (strona pokazuje „brak historii”).
 SC = {k: dt.datetime.utcfromtimestamp(v).date() for k, v in raw.get('seg_created', {}).items() if v}
