@@ -171,6 +171,21 @@ P['rfm'] = {'tot': C['p8.enr'], 'r': [C['p8.rfm.' + g] for g in ('R1', 'R2', 'R3
 st8 = day('2026-09-28'); n8 = (D0 - st8).days + 1
 P['day'] = {'e': series(636, '2026-09-28', 0), 'b': series(639, '2026-09-28', 0),
             'lab': [lab(st8 + dt.timedelta(i)) for i in range(n8)]}
+_sp = raw.get('p8split') or {}
+if _sp:
+    _L, _K = list(_sp['L']), list(_sp['K']); _s0 = day(_sp['start'])
+    for _g, _arr in ((877, _L), (878, _K)):
+        _m = (raw.get('membership') or {}).get(str(_g))
+        if _m and _m.get('e'):
+            _ms = day(_m['start'])
+            for _i, _v in enumerate(_m['e']):
+                _j = (_ms - _s0).days + _i
+                if _v is None or _j < len(_arr): continue
+                while len(_arr) < _j: _arr.append(0)
+                _arr.append(_v)
+    P['split'] = {'L': _L, 'K': _K, 'lab': [lab(_s0 + dt.timedelta(i)) for i in range(max(len(_L), len(_K)))]}
+P['lf'] = {k: C.get('p8.L.' + k) for k in ('tot', 'b1', 'b2', 'b3', 'fund')}; P['Ktot'] = C.get('p8.K.tot')
+P['reach'] = {'cl': C.get('p8.reach.cl'), 'ld': C.get('p8.reach.ld'), 'clT': C.get('cl.tot.ns'), 'ldT': C.get('lb.tot.ns')}
 cm = raw['camp']; P['camp'][0][2:6] = cm['157']['email']; P['camp'][1][2:6] = cm['158']['push']
 
 
