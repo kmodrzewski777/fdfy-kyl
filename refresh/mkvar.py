@@ -2,6 +2,8 @@ import json,base64,sys
 # python3 mkvar.py key1 key2 ... -> dopisuje warianty @email/@sms/@push/@app/@d_web do queries.json, wypisuje brakujące do vq.txt
 q=json.load(open('queries.json'));Q=dict((k,v) for k,v in q);ks=set(Q);c=json.load(open('raw.json'))['counts']
 V={'email':{"and":[{"segment":{"id":51}},{"not":{"segment":{"id":616}}}]},'sms':{"segment":{"id":71}},'push':{"segment":{"id":198}},'app':{"segment":{"id":157}},'d_web':{"not":{"segment":{"id":157}}}}
+if sys.argv[1]=='--combo':
+  sys.argv.pop(1);D={'d_app':V['app'],'d_web':V['d_web']};V={c+'_'+d:{"and":[V[c],D[d]]} for c in ('email','sms','push') for d in D}
 out=[]
 for k in sys.argv[1:]:
   for v,f in V.items():
